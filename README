@@ -1,0 +1,8 @@
+install libs:
+    pip install pyzbar
+    pip install psutil
+
+install dependencies:
+    sudo apt-get install libzbar0
+or
+    brew install zbar
