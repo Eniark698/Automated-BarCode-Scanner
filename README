@@ -1,6 +1,7 @@
 install libs:
     pip install pyzbar
     pip install psutil
+    pip install watchdog
 
 install dependencies:
     sudo apt-get install libzbar0
