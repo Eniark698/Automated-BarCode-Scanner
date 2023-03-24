@@ -2,6 +2,8 @@ install libs:
     pip install pyzbar
     pip install psutil
     pip install watchdog
+    pip install quantumrandom
+
 
 install dependencies:
     sudo apt-get install libzbar0

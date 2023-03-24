@@ -1,13 +1,13 @@
 def main():
     from tendo import singleton
-    from sys import exit
+    from sys import exit,maxsize
     try:
         me = singleton.SingleInstance()
     except:
         print("Already running")
         exit(-1)
 
-    from os import mkdir, listdir, getpid, stat
+    from os import mkdir, listdir, getpid, stat, remove
     from psutil import Process
     from shutil import copy,move,rmtree
     from distutils.dir_util import copy_tree
@@ -17,7 +17,12 @@ def main():
     from datetime import datetime
     from re import sub
     from sqlite3 import connect
+    from random import random, seed
+    from quantumrandom import randint
     Image.MAX_IMAGE_PIXELS = 1000000000
+    a=maxsize
+    #b=-maxsize-1
+    seed(randint(0,a))
 
     ###############################
     #your path
@@ -30,6 +35,7 @@ def main():
     cur=con.cursor()
     cur.execute("""create table if not exists scantable(
         id varchar(100)
+        ,BarCod varchar(100)
         ,location varchar(200)
         ,dateandtime varchar(100)
         ,storage_inbytes int64
@@ -49,7 +55,7 @@ def main():
 
     try:
         for i in list:
-            #codes=[]
+            codes=[]
             start_time = time()
             try:
                 image = Image.open(path + ('scans/{}'.format(i)))
@@ -65,27 +71,31 @@ def main():
             for obj in decoded_objects:
                 answer=obj.data.decode()
                 typecode=obj.type
-                #codes.append((answer,typecode))
+                codes.append((answer,typecode))
+            #answer1=answer
+            #answer=sub('\D', '', answer)
 
-            answer1=answer
-            answer=sub('\D', '', answer)
+            for (answer,typecode) in codes:
 
-            #for (answer,typecode) in codes:
-            if (len(answer)==13 and (typecode=='CODE39' or typecode== 'EAN13')) or (typecode=='CODE128'):
+                r=random()
+                h=hash(r)
 
-                move(path + ('scans/{}'.format(i))
-                    ,path + ('Processed/done/{}/{}.{}'.format(date,answer,format)))
-                s="""insert into scantable values ('{}','{}','{}',{},'{}')""".format(
-                                str(answer)
-                                ,path + ("Processed/done/{}/{}.{}".format(date,answer,format))
-                                ,date
-                                ,str(size)
-                                ,typecode)
-                con.execute(s)
-                con.commit()
-            else:
-                move(path + ('scans/{}'.format(i)), path + ('Processed/not done/{}.{}'.format(answer1,format)))
-            #rmtree(path + ('scans/{}'.format(i)))
+                if (len(answer)==13 and (typecode=='CODE39' or typecode== 'EAN13')) or (typecode=='CODE128'):
+
+                    copy(path + ('scans/{}'.format(i))
+                        ,path + ('Processed/done/{}/{}.{}'.format(date,h,format)))
+                    s="""insert into scantable values ('{}','{}','{}','{}',{},'{}')""".format(
+                                    str(h)
+                                    ,str(answer)
+                                    ,path + ("Processed/done/{}/{}.{}".format(date,h,format))
+                                    ,date
+                                    ,str(size)
+                                    ,typecode)
+                    con.execute(s)
+                    con.commit()
+                else:
+                    copy(path + ('scans/{}'.format(i)), path + ('Processed/not done/{}.{}'.format(h,format)))
+            remove(path + ('scans/{}'.format(i)))
             total+= time() - start_time
             #print("--- %s seconds ---" % (time() - start_time))
 
@@ -123,7 +133,3 @@ def main():
 
 
 main()
-
-
-
-
