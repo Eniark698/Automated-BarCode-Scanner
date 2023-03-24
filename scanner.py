@@ -19,47 +19,69 @@ def main():
     from sqlite3 import connect
     Image.MAX_IMAGE_PIXELS = 1000000000
 
-    con=connect('/home/parallels/Downloads/scandata.db')
-    cur=con.cursor()
-    cur.execute('create table if not exists scantable(id int64, location nvarchar(200), dateandtime varchar(100), storage_inbytes int64)')
+    ###############################
+    #your path
+    global path
+    path='/home/parallels/Downloads/'
 
-    list=listdir('/home/parallels/Downloads/scans/')
+    ###############################
+
+    con=connect(path + ('scandata.db'))
+    cur=con.cursor()
+    cur.execute("""create table if not exists scantable(
+        id varchar(100)
+        ,location varchar(200)
+        ,dateandtime varchar(100)
+        ,storage_inbytes int64
+        ,BarCodType varchar(100))""")
+
+    list=listdir(path + ('scans/'))
 
     total=0
     j=0
     Mem=[]
+    date=datetime.today().strftime('%Y-%m-%d')
 
+    try:
+        mkdir(path + ('Processed/done/{}'.format(date)))
+    except:
+        pass
 
     try:
         for i in list:
 
             start_time = time()
             try:
-                image = Image.open('/home/parallels/Downloads/scans/{}'.format(i))
+                image = Image.open(path + ('scans/{}'.format(i)))
             except:
-                move(r'/home/parallels/Downloads/scans/{}'.format(i), r'/home/parallels/Downloads/Processed/not done/{}.withproblem'.format(i))
+                move(path + ('scans/{}'.format(i)), path + ('Processed/not done/{}.withproblem'.format(i)))
                 j+=1
                 continue
             format=image.format
 
-            size=stat('/home/parallels/Downloads/scans/{}'.format(i)).st_size
+            size=stat(path + ('scans/{}'.format(i))).st_size
 
             decoded_objects = pyzbar.decode(image)
             for obj in decoded_objects:
                 answer=obj.data.decode()
+                typecode=obj.type
             answer1=answer
             answer=sub('\D', '', answer)
-            if len(answer)==13:
-                move('/home/parallels/Downloads/scans/{}'.format(i), '/home/parallels/Downloads/Processed/done/{}.{}'.format(answer,format))
-                s="""insert into scantable values ({},'{}','{}',{})""".format(
+
+            if (len(answer)==13 and (typecode=='CODE39' or typecode== 'EAN13')) or (typecode=='CODE128'):
+
+                move(path + ('scans/{}'.format(i))
+                     ,path + ('Processed/done/{}/{}.{}'.format(date,answer,format)))
+                s="""insert into scantable values ('{}','{}','{}',{},'{}')""".format(
                                     str(answer)
-                                   ,"/home/parallels/Downloads/Processed/done/{}.{}".format(answer,format)
-                                   ,datetime.now()
-                                   ,str(size))
+                                   ,path + ("Processed/done/{}/{}.{}".format(date,answer,format))
+                                   ,date
+                                   ,str(size)
+                                   ,typecode)
                 con.execute(s)
                 con.commit()
             else:
-                move('/home/parallels/Downloads/scans/{}'.format(i), '/home/parallels/Downloads/Processed/not done/{}.{}'.format(answer1,format))
+                move(path + ('scans/{}'.format(i)), path + ('Processed/not done/{}.{}'.format(answer1,format)))
 
             total+= time() - start_time
             #print("--- %s seconds ---" % (time() - start_time))
@@ -69,7 +91,7 @@ def main():
             j+=1
 
     except Exception as err:
-        f=open('/home/parallels/Documents/log.txt', 'a')
+        f=open(path + 'log.txt', 'a')
         f.write('--\n')
         f.write(str(Exception))
         f.write('\n')
@@ -93,8 +115,9 @@ def main():
             print('Number of scanned obj: ' + str(j))
             print('Avg time per obj: ' + str(total/j) + ' - sec/obj')
         else:
-            print('Zero objects scanned')
+            print('not completed scanning')
             print('\nstopped on : '+ str(j/len(list)*100) + ' %\n')
+
 
 main()
 
