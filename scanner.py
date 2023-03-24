@@ -9,7 +9,7 @@ def main():
 
     from os import mkdir, listdir, getpid, stat
     from psutil import Process
-    from shutil import move,rmtree
+    from shutil import copy,move,rmtree
     from distutils.dir_util import copy_tree
     from PIL import Image
     from pyzbar import pyzbar
@@ -49,7 +49,7 @@ def main():
 
     try:
         for i in list:
-
+            #codes=[]
             start_time = time()
             try:
                 image = Image.open(path + ('scans/{}'.format(i)))
@@ -65,24 +65,27 @@ def main():
             for obj in decoded_objects:
                 answer=obj.data.decode()
                 typecode=obj.type
+                #codes.append((answer,typecode))
+
             answer1=answer
             answer=sub('\D', '', answer)
 
+            #for (answer,typecode) in codes:
             if (len(answer)==13 and (typecode=='CODE39' or typecode== 'EAN13')) or (typecode=='CODE128'):
 
                 move(path + ('scans/{}'.format(i))
-                     ,path + ('Processed/done/{}/{}.{}'.format(date,answer,format)))
+                    ,path + ('Processed/done/{}/{}.{}'.format(date,answer,format)))
                 s="""insert into scantable values ('{}','{}','{}',{},'{}')""".format(
-                                    str(answer)
-                                   ,path + ("Processed/done/{}/{}.{}".format(date,answer,format))
-                                   ,date
-                                   ,str(size)
-                                   ,typecode)
+                                str(answer)
+                                ,path + ("Processed/done/{}/{}.{}".format(date,answer,format))
+                                ,date
+                                ,str(size)
+                                ,typecode)
                 con.execute(s)
                 con.commit()
             else:
                 move(path + ('scans/{}'.format(i)), path + ('Processed/not done/{}.{}'.format(answer1,format)))
-
+            #rmtree(path + ('scans/{}'.format(i)))
             total+= time() - start_time
             #print("--- %s seconds ---" % (time() - start_time))
 
