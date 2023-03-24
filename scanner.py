@@ -1,23 +1,27 @@
 def main():
-    # from tendo import singleton
-    # from sys import exit
-    # try:
-    #     me = singleton.SingleInstance()
-    # except:
-    #     print("Already running")
-    #     exit(-1)
+    from tendo import singleton
+    from sys import exit
+    try:
+        me = singleton.SingleInstance()
+    except:
+        print("Already running")
+        exit(-1)
 
-    from os import mkdir, listdir, getpid
+    from os import mkdir, listdir, getpid, stat
     from psutil import Process
     from shutil import move,rmtree
     from distutils.dir_util import copy_tree
     from PIL import Image
     from pyzbar import pyzbar
-    from time import time
+    from time import time, sleep
     from datetime import datetime
     from re import sub
+    from sqlite3 import connect
     Image.MAX_IMAGE_PIXELS = 1000000000
 
+    con=connect('/home/parallels/Downloads/scandata.db')
+    cur=con.cursor()
+    cur.execute('create table if not exists scantable(id int64, location nvarchar(200), dateandtime varchar(100), storage_inbytes int64)')
 
     list=listdir('/home/parallels/Downloads/scans/')
 
@@ -28,12 +32,17 @@ def main():
 
     try:
         for i in list:
-            if i=='.DS_Store':
-                print('skipped')
-                continue
 
             start_time = time()
-            image = Image.open('/home/parallels/Downloads/scans/{}'.format(i))
+            try:
+                image = Image.open('/home/parallels/Downloads/scans/{}'.format(i))
+            except:
+                move(r'/home/parallels/Downloads/scans/{}'.format(i), r'/home/parallels/Downloads/Processed/not done/{}.withproblem'.format(i))
+                j+=1
+                continue
+            format=image.format
+
+            size=stat('/home/parallels/Downloads/scans/{}'.format(i)).st_size
 
             decoded_objects = pyzbar.decode(image)
             for obj in decoded_objects:
@@ -41,9 +50,16 @@ def main():
             answer1=answer
             answer=sub('\D', '', answer)
             if len(answer)==13:
-                move('/home/parallels/Downloads/scans/{}'.format(i), '/home/parallels/Downloads/Processed/done/{}'.format(answer))
+                move('/home/parallels/Downloads/scans/{}'.format(i), '/home/parallels/Downloads/Processed/done/{}.{}'.format(answer,format))
+                s="""insert into scantable values ({},'{}','{}',{})""".format(
+                                    str(answer)
+                                   ,"/home/parallels/Downloads/Processed/done/{}.{}".format(answer,format)
+                                   ,datetime.now()
+                                   ,str(size))
+                con.execute(s)
+                con.commit()
             else:
-                move('/home/parallels/Downloads/scans/{}'.format(i), '/home/parallels/Downloads/Processed/not done/{}'.format(answer1))
+                move('/home/parallels/Downloads/scans/{}'.format(i), '/home/parallels/Downloads/Processed/not done/{}.{}'.format(answer1,format))
 
             total+= time() - start_time
             #print("--- %s seconds ---" % (time() - start_time))
@@ -78,3 +94,10 @@ def main():
             print('Avg time per obj: ' + str(total/j) + ' - sec/obj')
         else:
             print('Zero objects scanned')
+            print('\nstopped on : '+ str(j/len(list)*100) + ' %\n')
+
+main()
+
+
+
+
