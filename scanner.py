@@ -1,6 +1,14 @@
-def main():
+#import quantumrandom
+#a=maxsize
+#b=-maxsize-1
+#seed(quantumrandom.randint(0,a))
+
+
+
+
+def scan():
     from tendo import singleton
-    from sys import exit,maxsize
+    from sys import exit
     try:
         me = singleton.SingleInstance()
     except:
@@ -18,11 +26,10 @@ def main():
     from re import sub
     from sqlite3 import connect
     from random import random, seed
-    from quantumrandom import randint
+
     Image.MAX_IMAGE_PIXELS = 1000000000
-    a=maxsize
-    #b=-maxsize-1
-    seed(randint(0,a))
+
+    seed(hash(datetime.today().strftime('%Y-%m-%d')))
 
     ###############################
     #your path
@@ -60,7 +67,7 @@ def main():
             try:
                 image = Image.open(path + ('scans/{}'.format(i)))
             except:
-                move(path + ('scans/{}'.format(i)), path + ('Processed/not done/{}.withproblem'.format(i)))
+                move(path + ('scans/{}'.format(i)), path + ('Processed/not done/{}'.format(i)))
                 j+=1
                 continue
             format=image.format
@@ -72,6 +79,7 @@ def main():
                 answer=obj.data.decode()
                 typecode=obj.type
                 codes.append((answer,typecode))
+
             #answer1=answer
             #answer=sub('\D', '', answer)
 
@@ -80,7 +88,10 @@ def main():
                 r=random()
                 h=hash(r)
 
-                if (len(answer)==13 and (typecode=='CODE39' or typecode== 'EAN13')) or (typecode=='CODE128'):
+                if (((len(answer)==13 and typecode== 'EAN13')
+                     or typecode=='CODE39'
+                     or typecode=='CODE128')
+                    and answer!=''):
 
                     copy(path + ('scans/{}'.format(i))
                         ,path + ('Processed/done/{}/{}.{}'.format(date,h,format)))
@@ -132,4 +143,4 @@ def main():
             print('\nstopped on : '+ str(j/len(list)*100) + ' %\n')
 
 
-main()
+scan()
