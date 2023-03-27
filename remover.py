@@ -13,9 +13,8 @@ def remove():
     path='/home/parallels/Downloads/'
 
     list=listdir(path + ('Processed/done/'))
-
     for i in list:
-        if days_between(now_date,i)>100:
+        if abs(days_between(now_date,i))>100:
             rmtree(path + 'Processed/done/{}'.format(i))
 
 remove()
