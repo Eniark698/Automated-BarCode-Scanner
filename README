@@ -1,8 +1,9 @@
 install libs:
     pip install pyzbar
     pip install psutil
-    pip install watchdog
-    pip install quantumrandom
+    pip install tendo
+--    pip install watchdog
+--    pip install quantumrandom
 
 
 install dependencies:
