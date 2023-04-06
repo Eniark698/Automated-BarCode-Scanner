@@ -26,6 +26,10 @@ def scan():
     from re import sub
     from sqlite3 import connect
     from random import random, seed
+    #import warnings
+    #warnings.filterwarnings("ignore")
+
+
 
     Image.MAX_IMAGE_PIXELS = 1000000000
 
