@@ -71,7 +71,7 @@ def scan():
             try:
                 image = Image.open(path + ('scans/{}'.format(i)))
             except:
-                move(path + ('scans/{}'.format(i)), path + ('Processed/not done/{}'.format(i)))
+                move(path + ('scans/{}'.format(i)), path + ('Processed/with problem/{}'.format(i)))
                 j+=1
                 continue
             format=image.format
