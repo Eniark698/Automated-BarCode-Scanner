@@ -92,10 +92,10 @@ def scan():
                 r=random()
                 h=hash(r)
 
-                if (((len(answer)==13 and typecode== 'EAN13')
-                     or typecode=='CODE39'
-                     or typecode=='CODE128')
-                    and answer!=''):
+                if len(answer)==13 and (typecode== 'EAN13' or typecode== 'CODE39'):
+                    # or typecode=='CODE39'
+                    # or typecode=='CODE128')
+                    # and answer!=''):
 
                     copy(path + ('scans/{}'.format(i))
                         ,path + ('Processed/done/{}/{}.{}'.format(date,h,format)))
