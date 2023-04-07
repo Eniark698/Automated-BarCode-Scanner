@@ -30,6 +30,12 @@ def scan():
     #warnings.filterwarnings("ignore")
 
 
+    #import psycopg2
+    #conn = psycopg2.connect(
+    #host="localhost",
+    #database="suppliers",
+    #user="postgres",
+    #password="Abcd1234")
 
     Image.MAX_IMAGE_PIXELS = 1000000000
 

@@ -2,6 +2,8 @@ install libs:
     pip install pyzbar
     pip install psutil
     pip install tendo
+    pip install psycopg2-binary
+--    pip install psycopg2
 --    pip install watchdog
 --    pip install quantumrandom
 
