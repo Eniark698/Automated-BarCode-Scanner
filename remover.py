@@ -11,7 +11,7 @@ def remove():
 
     now_date=datetime.today().strftime('%Y-%m-%d')
 
-    path='/home/parallels/Downloads/'
+    path='F:\project/'
 
 
     with open(path + 'config.json') as json_file:
