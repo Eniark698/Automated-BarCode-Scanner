@@ -24,19 +24,21 @@ def scan():
     from time import time, sleep
     from datetime import datetime
     from re import sub
-    from sqlite3 import connect
+    #from sqlite3 import connect
     from random import random, seed
     #import warnings
     #warnings.filterwarnings("ignore")
 
 
-    #import psycopg2
-    #conn = psycopg2.connect(
-    #host="localhost",
-    #database="suppliers",
-    #user="postgres",
-    #password="Abcd1234")
+    import psycopg2
+    con = psycopg2.connect(
+    host="localhost",
+    database="postgres",
+    user="postgres",
+    password="$confident$")
 
+    con.autocommit = True
+    
     Image.MAX_IMAGE_PIXELS = 1000000000
 
     seed(hash(datetime.today().strftime('%Y-%m-%d')))
@@ -44,20 +46,20 @@ def scan():
     ###############################
     #your path
     global path
-    path='/home/parallels/Downloads/'
+    path='F:\project/'
 
     ###############################
 
-    con=connect(path + ('scandata.db'))
-    cur=con.cursor()
+    #con=connect(path + ('scandata.db'))
+    cur = con.cursor()
     cur.execute("""create table if not exists scantable(
-        id varchar(100)
-        ,BarCod varchar(100)
+        id varchar(50)
+        ,BarCod varchar(50)
         ,location varchar(200)
-        ,dateandtime varchar(100)
-        ,storage_inbytes int64
-        ,BarCodType varchar(100))""")
-
+        ,dateandtime timestamp
+        ,storage_inbytes bigint
+        ,BarCodType varchar(100));""")
+    
     list=listdir(path + ('scans/'))
 
     total=0
@@ -102,24 +104,20 @@ def scan():
                     # or typecode=='CODE39'
                     # or typecode=='CODE128')
                     # and answer!=''):
-
                     copy(path + ('scans/{}'.format(i))
                         ,path + ('Processed/done/{}/{}.{}'.format(date,h,format)))
-                    s="""insert into scantable values ('{}','{}','{}','{}',{},'{}')""".format(
+                    cur.execute("""insert into scantable values ('{}','{}','{}','{}',{},'{}');""".format(
                                     str(h)
                                     ,str(answer)
                                     ,path + ("Processed/done/{}/{}.{}".format(date,h,format))
                                     ,date
                                     ,str(size)
-                                    ,typecode)
-                    con.execute(s)
-                    con.commit()
+                                    ,typecode))
                 else:
                     copy(path + ('scans/{}'.format(i)), path + ('Processed/not done/{}.{}'.format(h,format)))
             remove(path + ('scans/{}'.format(i)))
             total+= time() - start_time
             #print("--- %s seconds ---" % (time() - start_time))
-
             process = Process(getpid())
             Mem.append(process.memory_info().rss/1024/1024)
             j+=1
@@ -148,9 +146,11 @@ def scan():
             print('Total time of exec: ' + str(total) + ' - sec')
             print('Number of scanned obj: ' + str(j))
             print('Avg time per obj: ' + str(total/j) + ' - sec/obj')
+            
         else:
-            print('not completed scanning')
-            print('\nstopped on : '+ str(j/len(list)*100) + ' %\n')
+            print('no file was scanned')
 
+    cur.close()
+    con.close()
 
 scan()
