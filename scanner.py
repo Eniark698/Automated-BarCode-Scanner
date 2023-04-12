@@ -25,6 +25,7 @@ def scan():
     from datetime import datetime
     from re import sub
     from random import random, seed
+    import json
 
     import psycopg2
     con = psycopg2.connect(
@@ -35,45 +36,64 @@ def scan():
     con.autocommit = True
     cur = con.cursor()
     cur.execute("""create table if not exists scantable(
-        id varchar(50)
-        ,BarCod varchar(50)
+         BarCod varchar(50) unique
         ,location varchar(200)
         ,dateandtime timestamp
         ,storage_inbytes bigint
         ,BarCodType varchar(100));""")
 
     Image.MAX_IMAGE_PIXELS = 1000000000
-    date=datetime.today().strftime('%Y-%m-%d')
-    seed(hash(date))
+    #date=datetime.today().strftime('%Y-%m-%d')
+    dateandtime=str(datetime.now())
+    seed(hash(dateandtime))
 
-    ###############################
-    #your path
-    global path
-    path='F:\project/'
-    ###############################
+    path='C:/scan_proj/'
 
-    list=listdir(path + ('scans/'))
+    #import path`es to working directories
+    with open(path + 'config.json') as json_file:
+        data = json.load(json_file)
+        try:
+            scanfolder=data["path to placement of scan`s folder"]
+            donefolder=data["path to placement of done`s folder"]
+            notdonefolder=data["path to placement of not done`s folder"]
+            problemfolder=data["path to placement of problem files`s folder"]
+            logsfolder=data["path to placement of log`s folder"]
+        except Exception as err:
+            scanfolder="C:/scan_proj/scan/"
+            donefolder="C:/scan_proj/done/"
+            notdonefolder="C:/scan_proj/not done/"
+            problemfolder="C:/scan_proj/problem/"
+            logsfolder="C:/scan_proj/logs/"
+
+            f=open(logsfolder + 'log_conf_scan.txt', 'a')
+            f.write('--\n')
+            f.write(str(Exception))
+            f.write('\n')
+            f.write(str(err))
+            f.write('occurred on ' + str(datetime.now()))
+            f.write('\n--\n\n\n')
+            f.close()
+
+
+
+    list=listdir(scanfolder)
     total, j, Mem = 0 , 0 , []
 
-
-    try:
-        mkdir(path + ('Processed/done/{}'.format(date)))
-    except:
-        pass
 
     try:
         for i in list:
             start_time = time()
 
             try:
-                image = Image.open(path + ('scans/{}'.format(i)))
+                image = Image.open(scanfolder + str(i))
             except:
-                move(path + ('scans/{}'.format(i)), path + ('Processed/with problem/{}'.format(i)))
+                move(scanfolder + str(i), problemfolder + str(i))
                 j+=1
                 continue
 
             format=image.format
-            size=stat(path + ('scans/{}'.format(i))).st_size
+            format=image.size
+            size=stat(scanfolder + str(i)).st_size
             codes=[]
 
             decoded_objects = pyzbar.decode(image)
@@ -88,19 +108,23 @@ def scan():
 
                 if len(answer)==13 and (typecode== 'EAN13' or typecode== 'CODE39'):
                     # or typecode=='CODE128'
+                    datn=str(datetime.now())
+                    name=answer + '_' + datn
 
-                    copy(path + ('scans/{}'.format(i))
-                        ,path + ('Processed/done/{}/{}.{}'.format(date,h,format)))
+                    copy(scanfolder + str(i)
+                        ,donefolder + name)
                     cur.execute("""insert into scantable values ('{}','{}','{}','{}',{},'{}');""".format(
-                                    str(h)
+                                    name
                                     ,str(answer)
-                                    ,path + ("Processed/done/{}/{}.{}".format(date,h,format))
-                                    ,date
+                                    ,donefolder + name
+                                    ,datn
                                     ,str(size)
                                     ,typecode))
+                    con.commit()
                 else:
-                    copy(path + ('scans/{}'.format(i)), path + ('Processed/not done/{}.{}'.format(h,format)))
-            remove(path + ('scans/{}'.format(i)))
+                    copy(scanfolder + str(i)
+                        ,notdonefolder + h)
+            remove(scanfolder + str(i))
 
             total+= time() - start_time
             process = Process(getpid())
@@ -108,7 +132,7 @@ def scan():
             j+=1
 
     except Exception as err:
-        f=open(path + 'log.txt', 'a')
+        f=open(logsfolder + 'log_scan.txt', 'a')
         f.write('--\n')
         f.write(str(Exception))
         f.write('\n')
