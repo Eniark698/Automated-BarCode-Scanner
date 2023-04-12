@@ -10,6 +10,9 @@ install libs:
 
 
 install dependencies:
-    sudo apt-get install libzbar0
-or
-    brew install zbar
+    for Ubuntu linux:
+        sudo apt-get install libzbar0
+    for OS X:
+        brew install zbar
+    for Windows:
+        install Visual Studio 2013 or higher
