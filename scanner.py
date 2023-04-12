@@ -24,11 +24,7 @@ def scan():
     from time import time, sleep
     from datetime import datetime
     from re import sub
-    #from sqlite3 import connect
     from random import random, seed
-    #import warnings
-    #warnings.filterwarnings("ignore")
-
 
     import psycopg2
     con = psycopg2.connect(
@@ -36,21 +32,7 @@ def scan():
     database="postgres",
     user="postgres",
     password="$confident$")
-
     con.autocommit = True
-    
-    Image.MAX_IMAGE_PIXELS = 1000000000
-
-    seed(hash(datetime.today().strftime('%Y-%m-%d')))
-
-    ###############################
-    #your path
-    global path
-    path='F:\project/'
-
-    ###############################
-
-    #con=connect(path + ('scandata.db'))
     cur = con.cursor()
     cur.execute("""create table if not exists scantable(
         id varchar(50)
@@ -59,13 +41,20 @@ def scan():
         ,dateandtime timestamp
         ,storage_inbytes bigint
         ,BarCodType varchar(100));""")
-    
-    list=listdir(path + ('scans/'))
 
-    total=0
-    j=0
-    Mem=[]
+    Image.MAX_IMAGE_PIXELS = 1000000000
     date=datetime.today().strftime('%Y-%m-%d')
+    seed(hash(date))
+
+    ###############################
+    #your path
+    global path
+    path='F:\project/'
+    ###############################
+
+    list=listdir(path + ('scans/'))
+    total, j, Mem = 0 , 0 , []
+
 
     try:
         mkdir(path + ('Processed/done/{}'.format(date)))
@@ -74,17 +63,18 @@ def scan():
 
     try:
         for i in list:
-            codes=[]
             start_time = time()
+
             try:
                 image = Image.open(path + ('scans/{}'.format(i)))
             except:
                 move(path + ('scans/{}'.format(i)), path + ('Processed/with problem/{}'.format(i)))
                 j+=1
                 continue
-            format=image.format
 
+            format=image.format
             size=stat(path + ('scans/{}'.format(i))).st_size
+            codes=[]
 
             decoded_objects = pyzbar.decode(image)
             for obj in decoded_objects:
@@ -92,18 +82,13 @@ def scan():
                 typecode=obj.type
                 codes.append((answer,typecode))
 
-            #answer1=answer
-            #answer=sub('\D', '', answer)
-
             for (answer,typecode) in codes:
-
                 r=random()
                 h=hash(r)
 
                 if len(answer)==13 and (typecode== 'EAN13' or typecode== 'CODE39'):
-                    # or typecode=='CODE39'
-                    # or typecode=='CODE128')
-                    # and answer!=''):
+                    # or typecode=='CODE128'
+
                     copy(path + ('scans/{}'.format(i))
                         ,path + ('Processed/done/{}/{}.{}'.format(date,h,format)))
                     cur.execute("""insert into scantable values ('{}','{}','{}','{}',{},'{}');""".format(
@@ -116,8 +101,8 @@ def scan():
                 else:
                     copy(path + ('scans/{}'.format(i)), path + ('Processed/not done/{}.{}'.format(h,format)))
             remove(path + ('scans/{}'.format(i)))
+
             total+= time() - start_time
-            #print("--- %s seconds ---" % (time() - start_time))
             process = Process(getpid())
             Mem.append(process.memory_info().rss/1024/1024)
             j+=1
@@ -146,7 +131,7 @@ def scan():
             print('Total time of exec: ' + str(total) + ' - sec')
             print('Number of scanned obj: ' + str(j))
             print('Avg time per obj: ' + str(total/j) + ' - sec/obj')
-            
+
         else:
             print('no file was scanned')
 

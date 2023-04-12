@@ -8,9 +8,9 @@ def remove():
         d1 = datetime.strptime(d1, "%Y-%m-%d")
         d2 = datetime.strptime(d2, "%Y-%m-%d")
         return abs((d2 - d1).days)
-
     now_date=datetime.today().strftime('%Y-%m-%d')
 
+    global path
     path='F:\project/'
 
 
@@ -31,7 +31,7 @@ def remove():
 
     list=listdir(path + ('Processed/done/'))
     for i in list:
-        if abs(days_between(now_date,i))>days:
+        if abs(days_between(now_date,i))>=days:
             rmtree(path + 'Processed/done/{}'.format(i))
 
 remove()
