@@ -1,3 +1,9 @@
 {
-    "days_to_remove":90
+    "_comment":"WHEN WRITING NEW PATH, REMEMBER TO ADD / IN THE END",
+    "days_to_remove":90,
+    "path to placement of scan`s folder": "C:/scan_proj/scan/",
+    "path to placement of done`s folder": "C:/scan_proj/done/",
+    "path to placement of not done`s folder": "C:/scan_proj/not done/",
+    "path to placement of problem files`s folder": "C:/scan_proj/problem/",
+    "path to placement of log`s folder": "C:/scan_proj/logs/"
 }
