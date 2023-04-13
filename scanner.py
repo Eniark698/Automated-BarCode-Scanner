@@ -32,19 +32,21 @@ def scan():
     host="localhost",
     database="postgres",
     user="postgres",
-    password="$confident$")
+    password="frgthy")
     con.autocommit = True
     cur = con.cursor()
     cur.execute("""create table if not exists scantable(
-         BarCod varchar(50) unique
-        ,location varchar(200)
+         id varchar(200) unique
+        ,BarCod varchar(200) 
+        ,location varchar(300)
         ,dateandtime timestamp
         ,storage_inbytes bigint
-        ,BarCodType varchar(100));""")
+        ,BarCodType varchar(50));""")
 
     Image.MAX_IMAGE_PIXELS = 1000000000
     #date=datetime.today().strftime('%Y-%m-%d')
     dateandtime=str(datetime.now())
+    
     seed(hash(dateandtime))
 
     path='C:/scan_proj/'
@@ -92,7 +94,6 @@ def scan():
                 continue
 
             format=image.format
-            format=image.size
             size=stat(scanfolder + str(i)).st_size
             codes=[]
 
@@ -109,7 +110,9 @@ def scan():
                 if len(answer)==13 and (typecode== 'EAN13' or typecode== 'CODE39'):
                     # or typecode=='CODE128'
                     datn=str(datetime.now())
-                    name=answer + '_' + datn
+                    r=random()
+                    h=hash(r)
+                    name = str(h) + '_'+ str(answer) + '.'+ format
 
                     copy(scanfolder + str(i)
                         ,donefolder + name)
@@ -123,9 +126,9 @@ def scan():
                     con.commit()
                 else:
                     copy(scanfolder + str(i)
-                        ,notdonefolder + h)
+                        ,notdonefolder + '_' + str(h) + '.'+ format)
             remove(scanfolder + str(i))
-
+            
             total+= time() - start_time
             process = Process(getpid())
             Mem.append(process.memory_info().rss/1024/1024)

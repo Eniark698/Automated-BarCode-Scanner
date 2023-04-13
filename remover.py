@@ -1,9 +1,8 @@
 def remove():
-    from os import listdir
     from datetime import datetime
-    from shutil import rmtree
     import json
-    import exifread
+    import os
+
 
     def days_between(d1, d2):
         d1 = datetime.strptime(d1, "%Y-%m-%d")
@@ -23,7 +22,6 @@ def remove():
             except Exception as err:
                 donefolder="C:/scan_proj/done/"
                 logsfolder="C:/scan_proj/logs/"
-
                 f=open(logsfolder + 'log_conf_rem.txt', 'a')
                 f.write('--\n')
                 f.write(str(Exception))
@@ -48,14 +46,15 @@ def remove():
             f.write('\n--\n\n\n')
             f.close()
 
+    list=os.listdir(donefolder)
+    j=0
 
-    list=listdir(donefolder)
     for i in list:
-        with open(donefolder + i, 'rb') as fh:
-            tags = exifread.process_file(fh, stop_tag="EXIF DateTimeOriginal")
-            dateTaken = tags["EXIF DateTimeOriginal"]
-            dateTaken = dateTaken.strftime('%Y-%m-%d')
-            if abs(days_between(now_date,dateTaken))>=days:
-                rmtree(donefolder + str(i))
+        c_time = datetime.fromtimestamp(os.stat(donefolder+ str(i)).st_ctime).strftime('%Y-%m-%d')
+        if abs(days_between(now_date,c_time))>=days:
+            os.remove(donefolder + str(i))
+            j+=1
+
+    print(j, ' files was removed')
 
 remove()
