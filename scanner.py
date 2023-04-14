@@ -1,11 +1,3 @@
-#import quantumrandom
-#a=maxsize
-#b=-maxsize-1
-#seed(quantumrandom.randint(0,a))
-
-
-
-
 def scan():
     from tendo import singleton
     from sys import exit
@@ -20,6 +12,7 @@ def scan():
     from shutil import copy,move,rmtree
     from distutils.dir_util import copy_tree
     from PIL import Image
+    Image.MAX_IMAGE_PIXELS = 100000000
     from pyzbar import pyzbar
     from time import time, sleep
     from datetime import datetime
@@ -43,11 +36,8 @@ def scan():
         ,storage_inbytes bigint
         ,BarCodType varchar(50));""")
 
-    Image.MAX_IMAGE_PIXELS = 1000000000
-    #date=datetime.today().strftime('%Y-%m-%d')
-    dateandtime=str(datetime.now())
-    
-    seed(hash(dateandtime))
+     
+    seed(hash(str(datetime.now())))
 
     path='C:/scan_proj/'
 
@@ -109,9 +99,9 @@ def scan():
 
                 if len(answer)==13 and (typecode== 'EAN13' or typecode== 'CODE39'):
                     # or typecode=='CODE128'
+
                     datn=str(datetime.now())
-                    r=random()
-                    h=hash(r)
+                    h=hash(random())
                     name = str(h) + '_'+ str(answer) + '.'+ format
 
                     copy(scanfolder + str(i)
