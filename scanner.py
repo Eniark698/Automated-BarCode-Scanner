@@ -1,4 +1,5 @@
-def scan():
+def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder):
+
     from tendo import singleton
     from sys import exit
     try:
@@ -9,69 +10,44 @@ def scan():
 
     from os import mkdir, listdir, getpid, stat, remove
     from psutil import Process
-    from shutil import copy,move,rmtree
+    from shutil import copy,move
     from distutils.dir_util import copy_tree
     from PIL import Image
-    Image.MAX_IMAGE_PIXELS = 100000000
+    Image.MAX_IMAGE_PIXELS = 10000000000
     from pyzbar import pyzbar
-    from time import time, sleep
+    from time import time
     from datetime import datetime
     from re import sub
     from random import random, seed
-    import json
+    from traceback import format_exc
+   
+
 
     import psycopg2
     con = psycopg2.connect(
-    host="localhost",
-    database="postgres",
-    user="postgres",
-    password="frgthy")
-    con.autocommit = True
+        host="localhost",
+        database="postgres",
+        user="postgres",
+        password="frgthy")
+    #con.autocommit = True
     cur = con.cursor()
     cur.execute("""create table if not exists scantable(
          id varchar(200) unique
-        ,BarCod varchar(200) 
-        ,location varchar(300)
+        ,BarCode varchar(200) 
+        ,location varchar(400)
         ,dateandtime timestamp
         ,storage_inbytes bigint
-        ,BarCodType varchar(50));""")
-
+        ,BarCodeType varchar(50)
+        ,direction varchar(1));""")
+    con.commit()
      
     seed(hash(str(datetime.now())))
 
-    path='C:/scan_proj/'
-
-    #import path`es to working directories
-    with open(path + 'config.json') as json_file:
-        data = json.load(json_file)
-        try:
-            scanfolder=data["path to placement of scan`s folder"]
-            donefolder=data["path to placement of done`s folder"]
-            notdonefolder=data["path to placement of not done`s folder"]
-            problemfolder=data["path to placement of problem files`s folder"]
-            logsfolder=data["path to placement of log`s folder"]
-        except Exception as err:
-            scanfolder="C:/scan_proj/scan/"
-            donefolder="C:/scan_proj/done/"
-            notdonefolder="C:/scan_proj/not done/"
-            problemfolder="C:/scan_proj/problem/"
-            logsfolder="C:/scan_proj/logs/"
-
-            f=open(logsfolder + 'log_conf_scan.txt', 'a')
-            f.write('--\n')
-            f.write(str(Exception))
-            f.write('\n')
-            f.write(str(err))
-            f.write('occurred on ' + str(datetime.now()))
-            f.write('\n--\n\n\n')
-            f.close()
-
-
+    
 
     list=listdir(scanfolder)
     total, j, Mem = 0 , 0 , []
-
-
+   
     try:
         for i in list:
             start_time = time()
@@ -93,66 +69,86 @@ def scan():
                 typecode=obj.type
                 codes.append((answer,typecode))
 
+            if codes == []:
+                move(scanfolder + str(i), problemfolder + str(i))
+                j+=1
+                continue
+    
+
             for (answer,typecode) in codes:
+                answer=str(answer)
                 r=random()
-                h=hash(r)
+                h=str(hash(r))
+                h=h[:3]
+                direction=answer[-1]
+                answer=answer[:-2]
+               
+                
 
-                if len(answer)==13 and (typecode== 'EAN13' or typecode== 'CODE39'):
-                    # or typecode=='CODE128'
+                if  typecode=='CODE128' and (direction in ['F', 'f', 'N', 'n']):
 
+                    direction=direction.lower()
                     datn=str(datetime.now())
-                    h=hash(random())
-                    name = str(h) + '_'+ str(answer) + '.'+ format
+                    name = answer + '_' + h + '.' + format
 
-                    copy(scanfolder + str(i)
-                        ,donefolder + name)
-                    cur.execute("""insert into scantable values ('{}','{}','{}','{}',{},'{}');""".format(
+                    try:
+                        mkdir(donefolder + direction + '/' + answer)
+                    except:
+                        pass
+
+                    cur.execute("""insert into scantable values ('{}','{}','{}','{}',{},'{}','{}');""".format(
                                     name
-                                    ,str(answer)
+                                    ,answer
                                     ,donefolder + name
                                     ,datn
                                     ,str(size)
-                                    ,typecode))
-                    con.commit()
-                else:
+                                    ,typecode
+                                    ,direction))
+                    
                     copy(scanfolder + str(i)
-                        ,notdonefolder + '_' + str(h) + '.'+ format)
-            remove(scanfolder + str(i))
+                        ,donefolder + direction + '/' + answer + '/' + name)
+                    
+                    con.commit()
+
+                elif len(answer)==13 and (typecode== 'EAN13' or typecode== 'CODE39'):
+                    copy(scanfolder + str(i)
+                        ,oldfolder + str(i)+ '.'+ format)
+                    
+                    
+                else:
+                    copy(scanfolder + str(i), problemfolder + str(i))
+            remove(scanfolder + str(i))        
+            
             
             total+= time() - start_time
             process = Process(getpid())
             Mem.append(process.memory_info().rss/1024/1024)
             j+=1
 
-    except Exception as err:
+    except:
         f=open(logsfolder + 'log_scan.txt', 'a')
-        f.write('--\n')
-        f.write(str(Exception))
-        f.write('\n')
-        f.write(str(err))
+        f.write('----------------------------------------\n')
+        f.write(format_exc())
         f.write('\nstopped on : '+ str(j/len(list)*100) + ' %\n')
-        f.write('occurred on ' + str(datetime.now()))
-        f.write('\n--\n\n\n')
+        f.write('occurred on ' + str(datetime.now())+ '\n')
+        f.write('----------------------------------------\n\n\n')
         f.close()
+        
+
+    else:
+        max=0
+        s=0
+        for i in Mem:
+            s+=i
+            if i>max:
+                max=i
+        print('Avg memory cons.: ' + str(s/len(Mem)) + ' - mb')
+        print('Max memory cons.: ' + str(max) + ' - mb')
+        print('Total time of exec: ' + str(total) + ' - sec')
+        print('Number of scanned obj: ' + str(j))
+        print('Avg time per obj: ' + str(total/j) + ' - sec/obj')
 
     finally:
-        if j!=0:
-            max=0
-            s=0
-            for i in Mem:
-                s+=i
-                if i>max:
-                    max=i
-            print('Avg memory cons.: ' + str(s/len(Mem)) + ' - mb')
-            print('Max memory cons.: ' + str(max) + ' - mb')
-            print('Total time of exec: ' + str(total) + ' - sec')
-            print('Number of scanned obj: ' + str(j))
-            print('Avg time per obj: ' + str(total/j) + ' - sec/obj')
+        cur.close()
+        con.close()
 
-        else:
-            print('no file was scanned')
-
-    cur.close()
-    con.close()
-
-scan()

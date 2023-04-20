@@ -18,7 +18,7 @@ Your must have installed python version 3
 
 Install all necessary packages for python
 ```bash
-    python.exe pip install -r requirments.txt
+    python.exe pip install -r requirements.txt
 ```   
 
 or, if you do not want to use .txt file, than
@@ -29,6 +29,7 @@ or, if you do not want to use .txt file, than
     pip install Pillow
     pip install psycopg2-binary
     pip install psycopg2
+    pip install pywin32
 ```
 
 
