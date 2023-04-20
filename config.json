@@ -1,9 +1,10 @@
 {
     "_comment":"WHEN WRITING NEW PATH, REMEMBER TO ADD / IN THE END",
+    "path":"D:/proc/",
     "days_to_remove":90,
-    "path to placement of scan`s folder": "C:/scan_proj/scan/",
-    "path to placement of done`s folder": "C:/scan_proj/done/",
-    "path to placement of not done`s folder": "C:/scan_proj/not done/",
-    "path to placement of problem files`s folder": "C:/scan_proj/problem/",
-    "path to placement of log`s folder": "C:/scan_proj/logs/"
+    "path to placement of scan`s folder": "D:/proc/scan/",
+    "path to placement of done folder for code128": "D:/proc/done/",
+    "path to placement of done folder for ean13 or code39": "D:/proc/not done/",
+    "path to placement of problem files`s folder": "D:/proc/problem/",
+    "path to placement of log`s folder": "D:/proc/logs/"
 }

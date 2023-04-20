@@ -1,9 +1,10 @@
-def remove():
+def remove(days, scanfolder, donefolder,oldfolder,problemfolder,logsfolder):
     from datetime import datetime
-    import json
-    import os
-
-
+    from os import remove,listdir,stat
+    import os.path as path
+    from time import ctime
+    from traceback import format_exc
+    from shutil import rmtree
     def days_between(d1, d2):
         d1 = datetime.strptime(d1, "%Y-%m-%d")
         d2 = datetime.strptime(d2, "%Y-%m-%d")
@@ -11,50 +12,56 @@ def remove():
     now_date=datetime.today().strftime('%Y-%m-%d')
 
 
-    path='C:/scan_proj/'
+  
 
 
-    with open(path + 'config.json') as json_file:
-            data = json.load(json_file)
-            try:
-                donefolder=data["path to placement of done`s folder"]
-                logsfolder=data["path to placement of log`s folder"]
-            except Exception as err:
-                donefolder="C:/scan_proj/done/"
-                logsfolder="C:/scan_proj/logs/"
-                f=open(logsfolder + 'log_conf_rem.txt', 'a')
-                f.write('--\n')
-                f.write(str(Exception))
-                f.write('\n')
-                f.write(str(err))
-                f.write('occurred on ' + str(datetime.now()))
-                f.write('\n--\n\n\n')
-                f.close()
-
-    with open(path + 'config.json') as json_file:
-        data = json.load(json_file)
-        try:
-            days=data["days_to_remove"]
-        except Exception as err:
-            days=100
-            f=open(logsfolder + 'log_conf_rem.txt', 'a')
-            f.write('--\n')
-            f.write(str(Exception))
-            f.write('\n')
-            f.write(str(err))
-            f.write('occurred on ' + str(datetime.now()))
-            f.write('\n--\n\n\n')
-            f.close()
-
-    list=os.listdir(donefolder)
+    
     j=0
+    try:
+        list=listdir(donefolder + 'f/')
+        for i in list:
+            c_time=datetime.fromtimestamp(path.getmtime(donefolder + 'f/' + i)).strftime('%Y-%m-%d')
+            if abs(days_between(now_date,c_time))>=days:
+                rmtree(donefolder + 'f/' + i)
+                j+=1
 
-    for i in list:
-        c_time = datetime.fromtimestamp(os.stat(donefolder+ str(i)).st_ctime).strftime('%Y-%m-%d')
-        if abs(days_between(now_date,c_time))>=days:
-            os.remove(donefolder + str(i))
-            j+=1
+        list=listdir(donefolder + 'n/')
+        for i in list:
+            c_time=datetime.fromtimestamp(path.getmtime(donefolder + 'n/' + i)).strftime('%Y-%m-%d')
+            if abs(days_between(now_date,c_time))>=days:
+                rmtree(donefolder + 'n/' + i)
+                j+=1
+        import psycopg2
+        con = psycopg2.connect(
+        host="localhost",
+        database="postgres",
+        user="postgres",
+        password="frgthy")
+        #con.autocommit = True
+        cur = con.cursor()
+        cur.execute("""create table if not exists scantable(
+         id varchar(200) unique
+        ,BarCode varchar(200) 
+        ,location varchar(400)
+        ,dateandtime timestamp
+        ,storage_inbytes bigint
+        ,BarCodeType varchar(50)
+        ,direction varchar(1));""")
+        cur.execute("""delete from scantable where DATE_PART('days', NOW()-dateandtime)>{};""".format(days))
+        
+
+    except:
+        f=open(logsfolder + 'log_rem.txt', 'a')
+        f.write('----------------------------------------\n')
+        f.write(format_exc())
+        f.write('occurred on ' + str(datetime.now())+ '\n')
+        f.write('----------------------------------------\n\n\n')
+        f.close()
+
+    try:
+        cur.close()
+        con.close()
+    except:
+        pass
 
     print(j, ' files was removed')
-
-remove()
