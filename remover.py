@@ -1,19 +1,15 @@
-def remove(days, scanfolder, donefolder,oldfolder,problemfolder,logsfolder):
+def remove(days,  donefolder,logsfolder):
     from datetime import datetime
-    from os import remove,listdir,stat
+    from os import listdir
     import os.path as path
-    from time import ctime
     from traceback import format_exc
     from shutil import rmtree
+
     def days_between(d1, d2):
         d1 = datetime.strptime(d1, "%Y-%m-%d")
         d2 = datetime.strptime(d2, "%Y-%m-%d")
         return abs((d2 - d1).days)
     now_date=datetime.today().strftime('%Y-%m-%d')
-
-
-  
-
 
     
     j=0
@@ -37,7 +33,7 @@ def remove(days, scanfolder, donefolder,oldfolder,problemfolder,logsfolder):
         database="postgres",
         user="postgres",
         password="frgthy")
-        #con.autocommit = True
+
         cur = con.cursor()
         cur.execute("""create table if not exists scantable(
          id varchar(200) unique
@@ -47,7 +43,10 @@ def remove(days, scanfolder, donefolder,oldfolder,problemfolder,logsfolder):
         ,storage_inbytes bigint
         ,BarCodeType varchar(50)
         ,direction varchar(1));""")
-        cur.execute("""delete from scantable where DATE_PART('days', NOW()-dateandtime)>{};""".format(days))
+        con.commit()
+        
+        cur.execute("""delete from scantable where DATE_PART('days', NOW()-dateandtime)>={};""".format(days))
+        con.commit()
         
 
     except:

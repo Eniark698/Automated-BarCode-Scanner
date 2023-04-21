@@ -11,16 +11,13 @@ def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder):
     from os import mkdir, listdir, getpid, stat, remove
     from psutil import Process
     from shutil import copy,move
-    from distutils.dir_util import copy_tree
     from PIL import Image
-    Image.MAX_IMAGE_PIXELS = 10000000000
+    Image.MAX_IMAGE_PIXELS = 100000000
     from pyzbar import pyzbar
     from time import time
     from datetime import datetime
-    from re import sub
     from random import random, seed
     from traceback import format_exc
-   
 
 
     import psycopg2
@@ -73,7 +70,6 @@ def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder):
                 move(scanfolder + str(i), problemfolder + str(i))
                 j+=1
                 continue
-    
 
             for (answer,typecode) in codes:
                 answer=str(answer)
@@ -81,20 +77,28 @@ def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder):
                 h=str(hash(r))
                 h=h[:3]
                 direction=answer[-1]
-                answer=answer[:-2]
-               
+                direction=direction.lower()
                 
 
+                   
                 if  typecode=='CODE128' and (direction in ['F', 'f', 'N', 'n']):
-
-                    direction=direction.lower()
-                    datn=str(datetime.now())
-                    name = answer + '_' + h + '.' + format
-
+                    answer=answer[:-2]
+                    name = answer + ',' + h + '.' + format
+                    
                     try:
                         mkdir(donefolder + direction + '/' + answer)
                     except:
-                        pass
+                        newlist=listdir(donefolder + direction + '/' + answer)
+                        sizearr=[]
+                        for el in newlist:
+                            size=stat(donefolder + direction + '/' + answer + '/' + el).st_size
+                            sizearr.append(size)
+                        if size in sizearr:
+                            continue
+                        else:
+                            pass
+                
+                    datn=str(datetime.now())
 
                     cur.execute("""insert into scantable values ('{}','{}','{}','{}',{},'{}','{}');""".format(
                                     name
@@ -104,21 +108,18 @@ def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder):
                                     ,str(size)
                                     ,typecode
                                     ,direction))
-                    
                     copy(scanfolder + str(i)
                         ,donefolder + direction + '/' + answer + '/' + name)
-                    
                     con.commit()
 
                 elif len(answer)==13 and (typecode== 'EAN13' or typecode== 'CODE39'):
+                    name = answer + ',' + h + '.' + format
                     copy(scanfolder + str(i)
-                        ,oldfolder + str(i)+ '.'+ format)
-                    
-                    
+                        ,oldfolder + name)
+                 
                 else:
                     copy(scanfolder + str(i), problemfolder + str(i))
             remove(scanfolder + str(i))        
-            
             
             total+= time() - start_time
             process = Process(getpid())
@@ -136,17 +137,20 @@ def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder):
         
 
     else:
-        max=0
-        s=0
-        for i in Mem:
-            s+=i
-            if i>max:
-                max=i
-        print('Avg memory cons.: ' + str(s/len(Mem)) + ' - mb')
-        print('Max memory cons.: ' + str(max) + ' - mb')
-        print('Total time of exec: ' + str(total) + ' - sec')
-        print('Number of scanned obj: ' + str(j))
-        print('Avg time per obj: ' + str(total/j) + ' - sec/obj')
+        try:
+            max=0
+            s=0
+            for i in Mem:
+                s+=i
+                if i>max:
+                    max=i
+            print('Avg memory cons.: ' + str(s/len(Mem)) + ' - mb')
+            print('Max memory cons.: ' + str(max) + ' - mb')
+            print('Total time of exec: ' + str(total) + ' - sec')
+            print('Number of scanned obj: ' + str(j))
+            print('Avg time per obj: ' + str(total/j) + ' - sec/obj')
+        except:
+            print('none files was scanned')
 
     finally:
         cur.close()
