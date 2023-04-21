@@ -35,9 +35,9 @@ class PythonScriptService(win32serviceutil.ServiceFramework):
             from input_values import importv
             from scanner import scan
             from remover import remove
-            days, scanfolder, donefolder,oldfolder,problemfolder,logsfolder=importv()
+            days, scanfolder, donefolder, oldfolder, problemfolder, logsfolder=importv()
             scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder)
-            remove(days,donefolder,logsfolder)
+            remove(days, donefolder,logsfolder)
             
 
            
