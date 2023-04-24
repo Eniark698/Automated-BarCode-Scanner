@@ -1,3 +1,4 @@
+![plot](./image.png)
 
 # BarCode scanner
 
@@ -19,7 +20,7 @@ Your must have installed python version 3
 Install all necessary packages for python
 ```bash
     python.exe pip install -r requirements.txt
-```   
+```
 
 or, if you do not want to use .txt file, than
 ```bash
@@ -35,7 +36,7 @@ or, if you do not want to use .txt file, than
 
 ## Deployment
 
-To start using move config.json to C:/scan_proj/
+To start using move config.json to D:/proc/
 
 
 
@@ -43,20 +44,28 @@ To start using move config.json to C:/scan_proj/
 ## Environment config
 
 To run this project, you will need to set up path to each directories where files is stored, and set up amount of days, after which, outdated files will be deleted:
-#### parametr | default value 
+#### parametr | default value
 
 `days_to_remove` |`90` -- amount of date, after which photos will be deleted
 
-`path to placement of scan's folder` | `C:/scan_proj/scan/` -- placement for files that used to be scanned
+`path to placement of scan's folder` | `D:/proc/scan/` -- placement for files that used to be scanned
 
-`path to placement of done's folder` | `C:/scan_proj/done/` --
-placement for files that will be scanned and barcode is ok detected; info about this files will be writed to postgres database
+`path to placement of done folder for code128` | `D:/proc/done/` --
+placement for CODE128 scanned files
 
-`path to placement of not done's folder` | `C:/scan_proj/not done/` --
-placement for files that will be scanned and barcode is not ok detected
+`path to placement of done folder for ean13 or code39` | `D:/proc/not done/` --
+placement for ean13 and code39 scanned files
 
 `path to placement of problem files's folder`| `C:/scan_proj/problem/` --
-placement for files that can not be scanned because it is not photos
+placement for files that can not be scanned because it is not photos, or for files, then have errors
 
 `path to placement of log's folder`| `C:/scan_proj/logs/` --
-placement for log with encounted error during program executing 
+placement for log with encounted error during program executing
+
+
+## Used By
+
+This project is used by the following companies:
+
+- BERTA group
+![Logo](https://berta.ua/wp-content/uploads/2019/07/logo.svg)
