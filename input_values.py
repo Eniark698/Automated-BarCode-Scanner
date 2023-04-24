@@ -3,9 +3,15 @@ def importv():
     import json    
     from datetime import datetime
 
+    #make variables global to get it from another scripts
     global  scanfolder, donefolder, oldfolder,problemfolder,logsfolder
+
+    #standart path to read config file
     path="D:/proc/"
 
+
+
+    #open config file, read it, in case of error, import default values, write to log files
     with open(path + 'config.json') as json_file:
         data = json.load(json_file)
         
@@ -35,4 +41,7 @@ def importv():
             f.write('\n--\n\n\n')
             f.close()
 
+
+    
+    #return imported values
     return days, scanfolder, donefolder,oldfolder,problemfolder,logsfolder

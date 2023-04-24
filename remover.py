@@ -4,7 +4,8 @@ def remove(days,  donefolder,logsfolder):
     import os.path as path
     from traceback import format_exc
     from shutil import rmtree
-
+    
+    #function to get difference in days between two dates
     def days_between(d1, d2):
         d1 = datetime.strptime(d1, "%Y-%m-%d")
         d2 = datetime.strptime(d2, "%Y-%m-%d")
@@ -12,6 +13,10 @@ def remove(days,  donefolder,logsfolder):
     now_date=datetime.today().strftime('%Y-%m-%d')
 
     
+
+
+    #try to delete files with scans, if date of modification greater then days_to_delete
+    #also, delete from psql DB
     j=0
     try:
         list=listdir(donefolder + 'f/')
@@ -49,6 +54,7 @@ def remove(days,  donefolder,logsfolder):
         con.commit()
         
 
+    #in case of error, write to log file
     except:
         f=open(logsfolder + 'log_rem.txt', 'a')
         f.write('----------------------------------------\n')
@@ -57,6 +63,8 @@ def remove(days,  donefolder,logsfolder):
         f.write('----------------------------------------\n\n\n')
         f.close()
 
+
+    #exit
     try:
         cur.close()
         con.close()
