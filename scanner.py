@@ -32,23 +32,23 @@ def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder):
     cur = con.cursor()
     cur.execute("""create table if not exists scantable(
          id varchar(200) unique
-        ,BarCode varchar(200) 
+        ,BarCode varchar(200)
         ,location varchar(400)
         ,dateandtime timestamp
         ,storage_inbytes bigint
         ,BarCodeType varchar(50)
         ,direction varchar(1));""")
     con.commit()
-     
-    #unique seed for random lib 
+
+    #unique seed for random lib
     seed(hash(str(datetime.now())))
 
-    
+
 
     #get list of files in scanfoler
     list=listdir(scanfolder)
     total, j, Mem = 0 , 0 , []
-   
+
 
    #procces that files
     try:
@@ -63,7 +63,7 @@ def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder):
                 move(scanfolder + str(i), problemfolder + str(i))
                 j+=1
                 continue
-            
+
             #get format and size of photo
             format=image.format
             size=stat(scanfolder + str(i)).st_size
@@ -82,7 +82,7 @@ def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder):
                 move(scanfolder + str(i), problemfolder + str(i))
                 j+=1
                 continue
-            
+
 
             #iterator thought all barcodes
             for (answer,typecode) in codes:
@@ -94,27 +94,18 @@ def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder):
                 direction=direction.lower()
                 #if barcode in type code128, then last symbol is direction of sales
 
-                #for code128, with correct ending 
+                #for code128, with correct ending
                 if  typecode=='CODE128' and (direction in ['F', 'f', 'N', 'n']):
                     answer=answer[:-2]
                     name = answer + ',' + h + '.' + format
-                    
+
 
                     #try to make folder with code128 name
-                    #if folder have been already exists, get size of all files in it, if matching then skip this photo
                     try:
                         mkdir(donefolder + direction + '/' + answer)
                     except:
-                        newlist=listdir(donefolder + direction + '/' + answer)
-                        sizearr=[]
-                        for el in newlist:
-                            size=stat(donefolder + direction + '/' + answer + '/' + el).st_size
-                            sizearr.append(size)
-                        if size in sizearr:
-                            continue
-                        else:
-                            pass
-                
+                        pass
+
 
                     datn=str(datetime.now())
 
@@ -129,11 +120,11 @@ def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder):
                                     ,str(size)
                                     ,typecode
                                     ,direction))
-                    
+
                     #copy scan into folder
                     copy(scanfolder + str(i)
                         ,donefolder + direction + '/' + answer + '/' + name)
-                    
+
                     #commit inserting into DB
                     con.commit()
 
@@ -143,21 +134,21 @@ def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder):
                     name = answer + ',' + h + '.' + format
                     copy(scanfolder + str(i)
                         ,oldfolder + name)
-                
+
 
 
                 #any else into problem folder
                 else:
                     copy(scanfolder + str(i), problemfolder + str(i))
-            remove(scanfolder + str(i))        
-            
+            remove(scanfolder + str(i))
+
 
             #get info about time and memory in current itaration
             total+= time() - start_time
             process = Process(getpid())
             Mem.append(process.memory_info().rss/1024/1024)
             j+=1
-    
+
 
 
     #if error, write to log file
@@ -169,7 +160,7 @@ def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder):
         f.write('occurred on ' + str(datetime.now())+ '\n')
         f.write('----------------------------------------\n\n\n')
         f.close()
-        
+
 
     #get info about loop
     else:
@@ -191,4 +182,3 @@ def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder):
     finally:
         cur.close()
         con.close()
-
