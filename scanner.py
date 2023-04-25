@@ -105,15 +105,7 @@ def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder):
                     try:
                         mkdir(donefolder + direction + '/' + answer)
                     except:
-                        newlist=listdir(donefolder + direction + '/' + answer)
-                        sizearr=[]
-                        for el in newlist:
-                            size=stat(donefolder + direction + '/' + answer + '/' + el).st_size
-                            sizearr.append(size)
-                        if size in sizearr:
-                            continue
-                        else:
-                            pass
+                        pass
                 
 
                     datn=str(datetime.now())
