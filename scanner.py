@@ -131,7 +131,7 @@ def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder):
 
 
                 #all correct code39 and ean13 into oldefolder
-                elif len(answer)==13 and (typecode== 'EAN13' or typecode== 'CODE39'):
+                elif (len(answer)==13 and typecode== 'EAN13') or typecode== 'CODE39':
                     name = answer + ',' + h + '.' + format
                     copy(scanfolder + str(i)
                         ,oldfolder + name)
