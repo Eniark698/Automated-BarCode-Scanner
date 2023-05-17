@@ -10,8 +10,8 @@ import time
 
 #class for win service
 class PythonScriptService(win32serviceutil.ServiceFramework):
-    _svc_name_ = 'PythonScriptService'
-    _svc_display_name_ = 'Python Script Service'
+    _svc_name_ = 'PythonScanner'
+    _svc_display_name_ = 'Python Scan Script'
 
     #constructor    
     def __init__(self, args):
@@ -35,16 +35,19 @@ class PythonScriptService(win32serviceutil.ServiceFramework):
     #main function
     def main(self):
         while self.is_alive:
-            # Call your other Python scripts here
             from input_values import importv
             from scanner import scan
             from remover import remove
-            #getting parametrs from config file to other functions
+            from rescanner import rescan
+            #import all important path variables
             days, scanfolder, donefolder, oldfolder, problemfolder, logsfolder=importv()
-            scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder)
-            remove(days, donefolder,logsfolder)
-            
 
+            scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder)
+            rescan(donefolder,problemfolder,logsfolder)
+            remove(days,donefolder,logsfolder)
+    
+
+    
            
 
             # repeat every 5 min 

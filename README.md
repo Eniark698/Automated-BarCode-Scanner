@@ -19,7 +19,7 @@ Your must have installed python version 3
 
 Install all necessary packages for python
 ```bash
-    python.exe pip install -r requirements.txt
+    python.exe -m pip install -r requirements.txt
 ```
 
 or, if you do not want to use .txt file, than
@@ -48,18 +48,18 @@ To run this project, you will need to set up path to each directories where file
 
 `days_to_remove` |`90` -- amount of date, after which photos will be deleted
 
-`path to placement of scan's folder` | `D:/proc/scan/` -- placement for files that used to be scanned
+`path to placement of scan's folder` | `F:/proc/scan/` -- placement for files that used to be scanned
 
-`path to placement of done folder for code128` | `D:/proc/done/` --
+`path to placement of done folder for code128` | `F:/proc/done/` --
 placement for CODE128 scanned files
 
-`path to placement of done folder for ean13 or code39` | `D:/proc/not done/` --
+`path to placement of done folder for ean13 or code39` | `F:/proc/not done/` --
 placement for ean13 and code39 scanned files
 
-`path to placement of problem files's folder`| `C:/scan_proj/problem/` --
+`path to placement of problem files's folder`| `F:/scan_proj/problem/` --
 placement for files that can not be scanned because it is not photos, or for files, then have errors
 
-`path to placement of log's folder`| `C:/scan_proj/logs/` --
+`path to placement of log's folder`| `F:/scan_proj/logs/` --
 placement for log with encounted error during program executing
 
 

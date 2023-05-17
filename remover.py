@@ -42,12 +42,13 @@ def remove(days,  donefolder,logsfolder):
         cur = con.cursor()
         cur.execute("""create table if not exists scantable(
          id varchar(200) unique
-        ,BarCode varchar(200) 
+        ,BarCode varchar(200)
         ,location varchar(400)
         ,dateandtime timestamp
         ,storage_inbytes bigint
         ,BarCodeType varchar(50)
-        ,direction varchar(1));""")
+        ,direction varchar(1)
+        ,is_rescanned bit);""")
         con.commit()
         
         cur.execute("""delete from scantable where DATE_PART('days', NOW()-dateandtime)>={};""".format(days))
