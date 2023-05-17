@@ -38,7 +38,7 @@ def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder):
         ,storage_inbytes bigint
         ,BarCodeType varchar(50)
         ,direction varchar(1)
-        ,is_rescanned bit);""")
+        ,is_rescanned boolean);""")
     con.commit()
 
     #unique seed for random lib
@@ -115,7 +115,7 @@ def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder):
                                     ,str(size)
                                     ,typecode
                                     ,direction
-                                    ,0))
+                                    ,False))
 
 
                     #try to make folder with code128 name

@@ -33,7 +33,7 @@ def rescan(donefolder,problemfolder,logsfolder):
         ,storage_inbytes bigint
         ,BarCodeType varchar(50)
         ,direction varchar(1)
-        ,is_rescanned bit);""")
+        ,is_rescanned boolean);""")
     con.commit()
 
     #unique seed for random lib
@@ -99,7 +99,7 @@ def rescan(donefolder,problemfolder,logsfolder):
                                         ,size
                                         ,None
                                         ,direction
-                                        ,1))
+                                        ,True))
 
 
                 #try to make folder with barcode name

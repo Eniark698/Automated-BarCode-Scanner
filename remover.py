@@ -48,7 +48,7 @@ def remove(days,  donefolder,logsfolder):
         ,storage_inbytes bigint
         ,BarCodeType varchar(50)
         ,direction varchar(1)
-        ,is_rescanned bit);""")
+        ,is_rescanned boolean);""")
         con.commit()
         
         cur.execute("""delete from scantable where DATE_PART('days', NOW()-dateandtime)>={};""".format(days))
