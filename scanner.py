@@ -9,9 +9,9 @@ def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder):
         print("Already running")
         exit(-1)
 
-    from os import mkdir, listdir, getpid, stat, remove
+    from os import mkdir, listdir, getpid, stat
     from psutil import Process
-    from shutil import copy,move
+    from shutil import move
     from PIL import Image
     Image.MAX_IMAGE_PIXELS = 100000000
     from pyzbar import pyzbar
@@ -37,7 +37,8 @@ def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder):
         ,dateandtime timestamp
         ,storage_inbytes bigint
         ,BarCodeType varchar(50)
-        ,direction varchar(1));""")
+        ,direction varchar(1)
+        ,is_rescanned bit);""")
     con.commit()
 
     #unique seed for random lib
@@ -100,31 +101,33 @@ def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder):
                     name = answer + ',' + h + '.' + format
 
 
-                    #try to make folder with code128 name
-                    try:
-                        mkdir(donefolder + direction + '/' + answer)
-                    except:
-                        pass
-
-
                     
                     datn=str(datetime.now())
 
 
 
                     #insert all info about scan in DB
-                    cur.execute("""insert into scantable values ('{}','{}','{}','{}',{},'{}','{}');""".format(
+                    cur.execute("""insert into scantable values ('{}','{}','{}','{}',{},'{}','{}','{}');""".format(
                                     name
                                     ,answer
                                     ,donefolder + name
                                     ,datn
                                     ,str(size)
                                     ,typecode
-                                    ,direction))
+                                    ,direction
+                                    ,0))
+
+
+                    #try to make folder with code128 name
+                    try:
+                        mkdir(donefolder + direction + '/' + answer)
+                    except:
+                        pass
 
                     #copy scan into folder
-                    copy(scanfolder + str(i)
+                    move(scanfolder + str(i)
                         ,donefolder + direction + '/' + answer + '/' + name)
+
 
                     #commit inserting into DB
                     con.commit()
@@ -133,15 +136,14 @@ def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder):
                 #all correct code39 and ean13 into oldefolder
                 elif (len(answer)==13 and typecode== 'EAN13') or typecode== 'CODE39':
                     name = answer + ',' + h + '.' + format
-                    copy(scanfolder + str(i)
+                    move(scanfolder + str(i)
                         ,oldfolder + name)
 
 
 
                 #any else into problem folder
                 else:
-                    copy(scanfolder + str(i), problemfolder + str(i))
-            remove(scanfolder + str(i))
+                    move(scanfolder + str(i), problemfolder + str(i))
 
 
             #get info about time and memory in current itaration
@@ -181,5 +183,9 @@ def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder):
             print('none files was scanned')
 
     finally:
-        cur.close()
-        con.close()
+        #exit
+        try:
+            cur.close()
+            con.close()
+        except:
+            pass

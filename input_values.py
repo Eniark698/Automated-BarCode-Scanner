@@ -7,7 +7,7 @@ def importv():
     global  scanfolder, donefolder, oldfolder,problemfolder,logsfolder
 
     #standart path to read config file
-    path="D:/proc/"
+    path="F:/proc/"
 
 
 
@@ -26,11 +26,11 @@ def importv():
         except Exception as err:
             days=100
             #path="D:/proc/"
-            scanfolder="D:/proc/scan/"
-            donefolder="D:/proc/Processed/done/"
-            oldfolder="D:/proc/Processed/not done/"
-            problemfolder="D:/proc/Processed/problem/"
-            logsfolder="D:/proc/logs/"
+            scanfolder="F:/proc/scan/"
+            donefolder="F:/proc/Processed/done/"
+            oldfolder="F:/proc/Processed/not done/"
+            problemfolder="F:/proc/Processed/problem/"
+            logsfolder="F:/proc/logs/"
 
             f=open(logsfolder + 'log_inp.txt', 'a')
             f.write('--\n')
