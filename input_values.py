@@ -4,7 +4,7 @@ def importv():
     from datetime import datetime
 
     #make variables global to get it from another scripts
-    global  scanfolder, donefolder, oldfolder,problemfolder,logsfolder
+    global  scanfolder, donefolder, oldfolder,problemfolder,logsfolder,delay,repeat_time,check_word
 
     #standart path to read config file
     path="F:/proc/"
@@ -23,6 +23,9 @@ def importv():
             oldfolder=data["path to placement of done folder for ean13 or code39"]
             problemfolder=data["path to placement of problem files`s folder"]
             logsfolder=data["path to placement of log`s folder"]
+            delay=data["delay to scan file"]
+            repeat_time=data["repeat time between two executions of script"]
+            check_word=data["check_word"]
         except Exception as err:
             days=100
             #path="D:/proc/"
@@ -31,6 +34,9 @@ def importv():
             oldfolder="F:/proc/Processed/not done/"
             problemfolder="F:/proc/Processed/problem/"
             logsfolder="F:/proc/logs/"
+            delay=5
+            repeat_time=5
+            check_word="IRIS"
 
             f=open(logsfolder + 'log_inp.txt', 'a')
             f.write('--\n')
@@ -44,4 +50,4 @@ def importv():
 
     
     #return imported values
-    return days, scanfolder, donefolder,oldfolder,problemfolder,logsfolder
+    return days, scanfolder, donefolder,oldfolder,problemfolder,logsfolder,delay,repeat_time,check_word

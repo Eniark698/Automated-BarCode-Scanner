@@ -1,4 +1,4 @@
-def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder):
+def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder,delay):
 
     #exit from another instance, if two times script was started
     from tendo import singleton
@@ -9,14 +9,14 @@ def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder):
         print("Already running")
         exit(-1)
 
-    from os import mkdir, listdir, getpid, stat
+    from os import mkdir, listdir, getpid, stat, path
     from psutil import Process
     from shutil import move
     from PIL import Image
     Image.MAX_IMAGE_PIXELS = 100000000
     from pyzbar import pyzbar
     from time import time
-    from datetime import datetime
+    from datetime import datetime, timedelta
     from random import random, seed
     from traceback import format_exc
 
@@ -55,6 +55,15 @@ def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder):
     try:
         for i in list:
             start_time = time()
+            
+            now_date=datetime.now()
+            delta=timedelta(minutes=delay)
+            c_time=datetime.fromtimestamp(path.getmtime(scanfolder + str(i)))
+            if now_date-c_time>delta:
+                pass
+            else:
+                continue
+
 
 
             #if file can not be opened(not a photo), move to problem folder
@@ -77,6 +86,8 @@ def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder):
                 answer=obj.data.decode()
                 typecode=obj.type
                 codes.append((answer,typecode))
+            image.close()
+
 
             #if no codes was detected, move to problem folder
             if codes == []:
@@ -102,8 +113,8 @@ def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder):
 
 
                     
-                    datn=str(datetime.now())
-
+                    #datn=str(datetime.now())
+                    datn=str(now_date)
 
 
                     #insert all info about scan in DB

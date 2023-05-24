@@ -40,10 +40,10 @@ class PythonScriptService(win32serviceutil.ServiceFramework):
             from remover import remove
             from rescanner import rescan
             #import all important path variables
-            days, scanfolder, donefolder, oldfolder, problemfolder, logsfolder=importv()
+            days, scanfolder, donefolder, oldfolder, problemfolder, logsfolder, delay,repeat_time,check_word=importv()
 
-            scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder)
-            rescan(donefolder,problemfolder,logsfolder)
+            scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder, delay)
+            rescan(donefolder,problemfolder,logsfolder,check_word)
             remove(days,donefolder,logsfolder)
     
 
@@ -51,7 +51,7 @@ class PythonScriptService(win32serviceutil.ServiceFramework):
            
 
             # repeat every 5 min 
-            time.sleep(5*60)  # Sleep for 5 minutes
+            time.sleep(5*repeat_time)  # Sleep for 5 minutes
 
 #all instructions to service together 
 if __name__ == '__main__':

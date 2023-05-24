@@ -6,14 +6,14 @@ while True:
     from remover import remove
     from rescanner import rescan
     #import all important path variables
-    days, scanfolder, donefolder, oldfolder, problemfolder, logsfolder=importv()
+    days, scanfolder, donefolder, oldfolder, problemfolder, logsfolder, delay,repeat_time,check_word =importv()
 
-    scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder)
-    rescan(donefolder,problemfolder,logsfolder)
+    scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder,delay)
+    rescan(donefolder,problemfolder,logsfolder,check_word)
     remove(days,donefolder,logsfolder)
     
 
     
 
     # Sleep for a while before running the scripts again
-    sleep(5 * 60)  # Sleep for 5 minutes
+    sleep(5 * repeat_time)  # Sleep for 5 minutes
