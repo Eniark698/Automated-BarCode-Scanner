@@ -1,4 +1,4 @@
-def rescan(donefolder,problemfolder,logsfolder):
+def rescan(donefolder,problemfolder,logsfolder,check_word):
     from tendo import singleton
     from sys import exit
     try:
@@ -42,9 +42,9 @@ def rescan(donefolder,problemfolder,logsfolder):
     #get all filenames in problem folder
     list=listdir(problemfolder)
 
-
-
-
+    j=0
+    check_len=len(check_word)+1
+    
     try:
         #for all files in problem folder
         
@@ -52,16 +52,18 @@ def rescan(donefolder,problemfolder,logsfolder):
             format = None
             size = None
 
+    
 
 
             #check if filename startswith control symbols
-            if i.startswith('IRIS_'):
+            if i.startswith(check_word):
                 format=''
-
+                j+=1
                 #try to open photo to get format and size
                 try:
                     image = Image.open(problemfolder + str(i))
                     format=image.format
+                    image.close()
                     size=str(stat(problemfolder + str(i)).st_size)
                 except:
                     pass
@@ -69,11 +71,11 @@ def rescan(donefolder,problemfolder,logsfolder):
                 #try to find dot in name to get extention of file
                 try:
                     pos=i.find('.')
-                    answer=i[5:pos]
+                    answer=i[check_len:pos]
                     if format!='':
                         format=i[pos+1:]
                 except:
-                    answer=i[5:]
+                    answer=i[check_len:]
 
 
                 #get random 3 symbols to unique file, get direction of sales
@@ -87,8 +89,9 @@ def rescan(donefolder,problemfolder,logsfolder):
                 name = answer + ',' + h + '.' + format
 
 
-
                 
+                if direction not in ('f', 'n'):
+                    continue
                 
                 #insert into DB
                 cur.execute("""insert into scantable values ('{}','{}','{}','{}',{},'{}','{}','{}');""".format(
@@ -139,6 +142,7 @@ def rescan(donefolder,problemfolder,logsfolder):
         f.close()
 
     #exit
+    print(j, ' files was rescanned')
     try:
         cur.close()
         con.close()

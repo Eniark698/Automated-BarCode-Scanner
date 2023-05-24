@@ -1,10 +1,18 @@
 {
-    "_comment":"WHEN WRITING NEW PATH, REMEMBER TO ADD / IN THE END",
+    "_comment":"WHEN WRITING NEW PATH, REMEMBER TO ADD / AT THE END",
+
+
     "path":"F:/proc/",
     "days_to_remove":90,
+    "delay to scan file":5,
+    "repeat time between two executions of script":5,
+    "check_word":"IRIS",
+
+
     "path to placement of scan`s folder": "F:/proc/scan/",
     "path to placement of done folder for code128": "F:/proc/done/",
     "path to placement of done folder for ean13 or code39": "F:/proc/not done/",
     "path to placement of problem files`s folder": "F:/proc/problem/",
     "path to placement of log`s folder": "F:/proc/logs/"
+    
 }
