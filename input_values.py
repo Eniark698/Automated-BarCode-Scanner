@@ -46,6 +46,7 @@ def importv():
             f.write('occurred on ' + str(datetime.now()))
             f.write('\n--\n\n\n')
             f.close()
+            return days, scanfolder, donefolder,oldfolder,problemfolder,logsfolder,delay,repeat_time,check_word
 
 
     
