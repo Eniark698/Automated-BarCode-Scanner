@@ -9,9 +9,9 @@ def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder,delay):
         print("Already running")
         exit(-1)
 
-    from os import mkdir, listdir, getpid, stat, path
+    from os import mkdir, listdir, getpid, stat, path, remove
     from psutil import Process
-    from shutil import move
+    from shutil import move,copy
     from PIL import Image
     Image.MAX_IMAGE_PIXELS = 100000000
     from pyzbar import pyzbar
@@ -70,7 +70,8 @@ def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder,delay):
             try:
                 image = Image.open(scanfolder + str(i))
             except:
-                move(scanfolder + str(i), problemfolder + str(i))
+                copy(scanfolder + str(i), problemfolder + str(i))
+                remove(scanfolder + str(i))
                 j+=1
                 continue
 
@@ -91,13 +92,16 @@ def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder,delay):
 
             #if no codes was detected, move to problem folder
             if codes == []:
-                move(scanfolder + str(i), problemfolder + str(i))
+                copy(scanfolder + str(i), problemfolder + str(i))
+                remove(scanfolder + str(i))
                 j+=1
                 continue
 
 
             #iterator thought all barcodes
             for (answer,typecode) in codes:
+                if answer=='' or answer is None:
+                    continue
                 answer=str(answer)
                 r=random()
                 h=str(hash(r))
@@ -136,25 +140,31 @@ def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder,delay):
                         pass
 
                     #copy scan into folder
-                    move(scanfolder + str(i)
+                    copy(scanfolder + str(i)
                         ,donefolder + direction + '/' + answer + '/' + name)
+                    remove(scanfolder + str(i))
 
 
                     #commit inserting into DB
                     con.commit()
+                    break
 
 
                 #all correct code39 and ean13 into oldefolder
                 elif (len(answer)==13 and typecode== 'EAN13') or typecode== 'CODE39':
                     name = answer + ',' + h + '.' + format
-                    move(scanfolder + str(i)
+                    copy(scanfolder + str(i)
                         ,oldfolder + name)
+                    remove(scanfolder + str(i))
+                    break
 
 
 
                 #any else into problem folder
                 else:
-                    move(scanfolder + str(i), problemfolder + str(i))
+                    copy(scanfolder + str(i), problemfolder + str(i))
+                    remove(scanfolder + str(i))
+                    break
 
 
             #get info about time and memory in current itaration
