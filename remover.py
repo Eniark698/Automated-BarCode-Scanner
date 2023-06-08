@@ -41,7 +41,7 @@ def remove(days,  donefolder,logsfolder):
 
         cur = con.cursor()
         cur.execute("""create table if not exists scantable(
-         id varchar(200) unique
+         id varchar(200) 
         ,BarCode varchar(200)
         ,location varchar(400)
         ,dateandtime timestamp

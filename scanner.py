@@ -31,7 +31,7 @@ def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder,delay):
     #con.autocommit = True
     cur = con.cursor()
     cur.execute("""create table if not exists scantable(
-         id varchar(200) unique
+         id varchar(200) 
         ,BarCode varchar(200)
         ,location varchar(400)
         ,dateandtime timestamp
@@ -125,7 +125,7 @@ def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder,delay):
                     cur.execute("""insert into scantable values ('{}','{}','{}','{}',{},'{}','{}','{}');""".format(
                                     name
                                     ,answer
-                                    ,donefolder + name
+                                    ,donefolder + direction + '/' + answer + '/' + name
                                     ,datn
                                     ,str(size)
                                     ,typecode
