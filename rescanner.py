@@ -44,12 +44,12 @@ def rescan(donefolder,problemfolder,logsfolder,check_word):
 
     j=0
     check_len=len(check_word)+1
-    
+    format='JPEG'
+
     try:
         #for all files in problem folder
         
         for i in list:
-            format = None
             size = None
 
     
@@ -57,12 +57,11 @@ def rescan(donefolder,problemfolder,logsfolder,check_word):
 
             #check if filename startswith control symbols
             if i.startswith(check_word):
-                format=''
+                
                 j+=1
                 #try to open photo to get format and size
                 try:
                     image = Image.open(problemfolder + str(i))
-                    format=image.format
                     image.close()
                     size=str(stat(problemfolder + str(i)).st_size)
                 except:
@@ -72,8 +71,6 @@ def rescan(donefolder,problemfolder,logsfolder,check_word):
                 try:
                     pos=i.find('.')
                     answer=i[check_len:pos]
-                    if format!='':
-                        format=i[pos+1:]
                 except:
                     answer=i[check_len:]
 
@@ -129,7 +126,8 @@ def rescan(donefolder,problemfolder,logsfolder,check_word):
 
 
 
-            format = None
+            
+            
             size = None
     #write if error has occurred
     except:
