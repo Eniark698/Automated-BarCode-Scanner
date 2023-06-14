@@ -5,12 +5,14 @@ while True:
     from scanner import scan
     from remover import remove
     from rescanner import rescan
+    from writing import write
     #import all important path variables
     days, scanfolder, donefolder, oldfolder, problemfolder, logsfolder, delay,repeat_time,check_word =importv()
 
     scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder,delay)
     rescan(donefolder,problemfolder,logsfolder,check_word)
     remove(days,donefolder,logsfolder)
+    write(logsfolder)
     
 
     
