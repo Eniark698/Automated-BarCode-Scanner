@@ -1,4 +1,4 @@
-def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder,delay):
+def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder,delay,pattern):
 
     #exit from another instance, if two times script was started
     from tendo import singleton
@@ -19,7 +19,7 @@ def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder,delay):
     from datetime import datetime, timedelta
     from random import random, seed
     from traceback import format_exc
-
+    import re
 
     #connect to psql, create table if not exists
     import psycopg2
@@ -106,6 +106,19 @@ def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder,delay):
                 r=random()
                 h=str(hash(r))
                 h=h[:3]
+
+                if re.match(pattern, answer)==None:
+                    copy(scanfolder + str(i), problemfolder + str(i))
+                    remove(scanfolder + str(i))
+                    j+=1
+                    continue
+
+                else:
+                    pass
+
+
+
+
                 direction=answer[-1]
                 direction=direction.lower()
                 #if barcode in type code128, then last symbol is direction of sales
