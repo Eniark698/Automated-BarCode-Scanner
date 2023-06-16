@@ -1,4 +1,4 @@
-def rescan(donefolder,problemfolder,logsfolder,check_word):
+def rescan(donefolder,problemfolder,logsfolder,check_word,pattern):
     from tendo import singleton
     from sys import exit
     try:
@@ -14,7 +14,7 @@ def rescan(donefolder,problemfolder,logsfolder,check_word):
     from datetime import datetime
     from random import random, seed
     from traceback import format_exc
-
+    import re
 
     #connect to psql, create table if not exists
     import psycopg2
@@ -41,6 +41,8 @@ def rescan(donefolder,problemfolder,logsfolder,check_word):
 
     #get all filenames in problem folder
     list=listdir(problemfolder)
+
+    
 
     j=0
     check_len=len(check_word)+1
@@ -79,6 +81,14 @@ def rescan(donefolder,problemfolder,logsfolder,check_word):
                 r=random()
                 h=str(hash(r))
                 h=h[:3]
+
+
+                if re.match(pattern, answer)==None:
+                    continue
+                else:
+                    pass
+
+
                 direction=answer[-1]
                 direction=direction.lower()
                 datn=str(datetime.now())

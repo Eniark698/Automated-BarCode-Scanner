@@ -41,10 +41,11 @@ class PythonScriptService(win32serviceutil.ServiceFramework):
             from rescanner import rescan
             from writing import write
             #import all important path variables
+            pattern=r'[0-9]{5}\-[0-9]{7}_[0-9]{4}_[0-9]{1}_[a-zA-z]'
             days, scanfolder, donefolder, oldfolder, problemfolder, logsfolder, delay,repeat_time,check_word=importv()
-
-            scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder, delay)
-            rescan(donefolder,problemfolder,logsfolder,check_word)
+            
+            scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder, delay,pattern)
+            rescan(donefolder,problemfolder,logsfolder,check_word,pattern)
             remove(days,donefolder,logsfolder)
             write(logsfolder)
 
