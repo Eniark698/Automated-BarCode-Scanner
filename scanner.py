@@ -21,6 +21,8 @@ def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder,delay,pattern
     from traceback import format_exc
     import re
 
+    failed=0
+
     #connect to psql, create table if not exists
     import psycopg2
     con = psycopg2.connect(
@@ -31,7 +33,7 @@ def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder,delay,pattern
     #con.autocommit = True
     cur = con.cursor()
     cur.execute("""create table if not exists scantable(
-         id varchar(200) 
+         id varchar(200)
         ,BarCode varchar(200)
         ,location varchar(400)
         ,dateandtime timestamp
@@ -55,7 +57,7 @@ def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder,delay,pattern
     try:
         for i in list:
             start_time = time()
-            
+
             now_date=datetime.now()
             delta=timedelta(minutes=delay)
             c_time=datetime.fromtimestamp(path.getmtime(scanfolder + str(i)))
@@ -129,7 +131,7 @@ def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder,delay,pattern
                     name = answer + ',' + h + '.' + format
 
 
-                    
+
                     #datn=str(datetime.now())
                     datn=str(now_date)
 
@@ -190,36 +192,94 @@ def scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder,delay,pattern
 
     #if error, write to log file
     except:
+        failed=1
         f=open(logsfolder + 'log_scan.txt', 'a')
         f.write('----------------------------------------\n')
         f.write(format_exc())
-        f.write('\nstopped on : '+ str(j/len(list)*100) + ' %\n')
+        f.write('\nstopped on : '+ str(i) + ' element \n')
         f.write('occurred on ' + str(datetime.now())+ '\n')
         f.write('----------------------------------------\n\n\n')
         f.close()
 
 
-    #get info about loop
-    else:
-        try:
-            max=0
-            s=0
-            for i in Mem:
-                s+=i
-                if i>max:
-                    max=i
-            print('Avg memory cons.: ' + str(s/len(Mem)) + ' - mb')
-            print('Max memory cons.: ' + str(max) + ' - mb')
-            print('Total time of exec: ' + str(total) + ' - sec')
-            print('Number of scanned obj: ' + str(j))
-            print('Avg time per obj: ' + str(total/j) + ' - sec/obj')
-        except:
-            print('none files was scanned')
+    # #get info about loop
+    # finally:
+    #     try:
+    #         cur.execute("""create table if not exists monitortable(
+    #         dateandtime timestamp
+    #         ,Avg_memory_cons float
+    #         ,Max_memory_cons float
+    #         ,Total_time_of_exec float
+    #         ,Number_of_scanned_obj int
+    #         ,Avg_time_per_obj float
+    #         ,Failed boolean
+    #         ,is_rescanned boolean );""")
 
-    finally:
-        #exit
-        try:
-            cur.close()
-            con.close()
-        except:
-            pass
+
+
+
+
+    #         try:
+    #             #at least one file was scanned
+    #             max=0
+    #             s=0
+    #             for i in Mem:
+    #                 s+=i
+    #                 if i>max:
+    #                     max=i
+
+    #             sql_insert_query_monitor  = """
+    #                                 INSERT INTO your_table_name (double_column, another_column)
+    #                                 VALUES (%s, %s)
+    #                                 """
+
+
+    #             values_to_insert=(
+    #                             datetime.now()
+    #                             ,s/len(Mem)
+    #                             ,max
+    #                             ,total
+    #                             ,j
+    #                             ,total/j
+    #                             ,failed
+    #                             ,False)
+
+
+    #             cur.execute(sql_insert_query_monitor, values_to_insert)
+    #             con.commit()
+
+    #         except:
+    #             #none files was scanned
+    #             values_to_insert=( datetime.now()
+    #                             ,None
+    #                             ,None
+    #                             ,None
+    #                             ,None
+    #                             ,None
+    #                             ,failed
+    #                             ,False)
+    #             cur.execute(sql_insert_query_monitor, values_to_insert)
+
+
+
+
+    #         con.commit()
+
+
+
+    #     except:
+    #         f=open(logsfolder + 'log_scan.txt', 'a')
+    #         f.write('----------------------------------------\n')
+    #         f.write(format_exc())
+    #         f.write('\nstopped on : '+ str(i) + ' element \n')
+    #         f.write('occurred on ' + str(datetime.now())+ '\n')
+    #         f.write('----------------------------------------\n\n\n')
+    #         f.close()
+
+
+    #exit
+    try:
+        cur.close()
+        con.close()
+    except:
+        pass
