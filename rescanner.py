@@ -26,7 +26,7 @@ def rescan(donefolder,problemfolder,logsfolder,check_word,pattern):
     #con.autocommit = True
     cur = con.cursor()
     cur.execute("""create table if not exists scantable(
-         id varchar(200) 
+         id varchar(200)
         ,BarCode varchar(200)
         ,location varchar(400)
         ,dateandtime timestamp
@@ -42,7 +42,7 @@ def rescan(donefolder,problemfolder,logsfolder,check_word,pattern):
     #get all filenames in problem folder
     list=listdir(problemfolder)
 
-    
+
 
     j=0
     check_len=len(check_word)+1
@@ -50,16 +50,16 @@ def rescan(donefolder,problemfolder,logsfolder,check_word,pattern):
 
     try:
         #for all files in problem folder
-        
+
         for i in list:
             size = None
 
-    
+
 
 
             #check if filename startswith control symbols
             if i.startswith(check_word):
-                
+
                 j+=1
                 #try to open photo to get format and size
                 try:
@@ -96,10 +96,10 @@ def rescan(donefolder,problemfolder,logsfolder,check_word,pattern):
                 name = answer + ',' + h + '.' + format
 
 
-                
+
                 if direction not in ('f', 'n'):
                     continue
-                
+
                 #insert into DB
                 cur.execute("""insert into scantable values ('{}','{}','{}','{}',{},'{}','{}','{}');""".format(
                                         name
@@ -127,7 +127,7 @@ def rescan(donefolder,problemfolder,logsfolder,check_word,pattern):
                 except:
                     con.rollback()
                     continue
-               
+
                 #commit inserting into DB
                 con.commit()
 
@@ -136,8 +136,8 @@ def rescan(donefolder,problemfolder,logsfolder,check_word,pattern):
 
 
 
-            
-            
+
+
             size = None
     #write if error has occurred
     except:
@@ -156,6 +156,3 @@ def rescan(donefolder,problemfolder,logsfolder,check_word,pattern):
         con.close()
     except:
         pass
-
-        
-    

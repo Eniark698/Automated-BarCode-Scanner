@@ -1,6 +1,6 @@
 from time import sleep
 
-while True:
+def run_main_loop():
     from input_values import importv
     from scanner import scan
     from remover import remove
@@ -14,9 +14,14 @@ while True:
     rescan(donefolder,problemfolder,logsfolder,check_word,pattern)
     remove(days,donefolder,logsfolder)
     write(logsfolder)
-    
 
-    
 
-    # Sleep for a while before running the scripts again
-    sleep(5 * repeat_time)  # Sleep for 5 minutes
+
+
+
+    sleep(60 * repeat_time)  # Sleep for 5 minutes
+
+
+if __name__ == "__main__":
+    while True:
+        run_main_loop()

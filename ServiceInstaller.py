@@ -5,15 +5,24 @@ import win32service
 import win32event
 import servicemanager
 import subprocess
-import time
+
 
 
 #class for win service
 class PythonScriptService(win32serviceutil.ServiceFramework):
     _svc_name_ = 'PythonScanner'
     _svc_display_name_ = 'Python Scan Script'
+    _svc_description_ = """Automated BarCode Scanner is a service that scans files for barcodes
+    , detects them, and filters the files based on barcode information.
+    It reads input files, scans for barcodes, writes data to a database, and manages file movement.
+    The service supports various photo types, enables rescanning of problem files
+    , and offers easy installation and configuration.
+    Achieve efficient barcode scanning with this automation solution."""
 
-    #constructor    
+
+
+
+    #constructor
     def __init__(self, args):
         win32serviceutil.ServiceFramework.__init__(self, args)
         self.hWaitStop = win32event.CreateEvent(None, 0, 0, None)
@@ -34,28 +43,11 @@ class PythonScriptService(win32serviceutil.ServiceFramework):
 
     #main function
     def main(self):
+        import main  # Import the main module
         while self.is_alive:
-            from input_values import importv
-            from scanner import scan
-            from remover import remove
-            from rescanner import rescan
-            from writing import write
-            #import all important path variables
-            pattern=r'[0-9]{5}\-[0-9]{7}_[0-9]{4}_[0-9]{1}_[a-zA-z]'
-            days, scanfolder, donefolder, oldfolder, problemfolder, logsfolder, delay,repeat_time,check_word=importv()
-            
-            scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder, delay,pattern)
-            rescan(donefolder,problemfolder,logsfolder,check_word,pattern)
-            remove(days,donefolder,logsfolder)
-            write(logsfolder)
+            main.run_main_loop()
 
-    
-           
-
-            # repeat every 5 min 
-            time.sleep(5*repeat_time)  # Sleep for 5 minutes
-
-#all instructions to service together 
+#all instructions to service together
 if __name__ == '__main__':
     if len(sys.argv) == 1:
         servicemanager.Initialize()
