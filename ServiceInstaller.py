@@ -43,9 +43,10 @@ class PythonScriptService(win32serviceutil.ServiceFramework):
 
     #main function
     def main(self):
-        import main  # Import the main module
+        python_executable = r"./win-venv-311/Scripts/python.exe"  # Change this to the path of your venv Python interpreter
+        script_path = r"./main.py"  # Change this to the path of your main module
         while self.is_alive:
-            main.run_main_loop()
+            subprocess.call([python_executable, script_path])
 
 #all instructions to service together
 if __name__ == '__main__':

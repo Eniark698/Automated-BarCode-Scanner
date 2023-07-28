@@ -18,7 +18,7 @@ def run_main_loop():
 
 
 
-
+    print('Waiting...')
     sleep(60 * repeat_time)  # Sleep for 5 minutes
 
 

@@ -15,7 +15,7 @@ def write(logsfolder):
         cur.execute('select count(*) from scantable where dateandtime>=now()::date')
 
         number_str  = cur.fetchall()
-        number=number_str[0]
+        number=number_str[0][0]
         
         f=open(logsfolder + 'total.txt', 'a')
         f.write('----------------------------------------\n')
@@ -23,7 +23,7 @@ def write(logsfolder):
         f.write('occurred on ' + str(datetime.now())+ '\n')
         f.write('----------------------------------------\n\n\n')
         f.close()
-
+        print('Written: ', int(number))
         cur.close()
         con.close()
 

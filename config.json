@@ -9,10 +9,10 @@
     "check_word":"IRIS",
 
 
-    "path to placement of scan`s folder": "F:/proc/scan/",
+    "path to placement of scan`s folder": ["F:/proc/scan/","F:/proc/scanMukachevo/","F:/proc/scanSambir/"],
     "path to placement of done folder for code128": "F:/proc/done/",
     "path to placement of done folder for ean13 or code39": "F:/proc/not done/",
-    "path to placement of problem files`s folder": "F:/proc/problem/",
+    "path to placement of problem files`s folder": ["F:/proc/problem/","F:/proc/problemMukachevo/","F:/proc/problemSambir/"],
     "path to placement of log`s folder": "F:/proc/logs/"
     
 }
