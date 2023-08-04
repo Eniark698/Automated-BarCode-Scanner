@@ -5,7 +5,7 @@
 Program scan file for barcode, detect it, and filter that files
 If you read more, program have in input file of any photos type, scan for barcode in, gain that info, if correct-- write to postgres database, and move to another folder; if barcode is not correct-- move to folder with incorrect codes; if it is not photos file-- move to folder with problem files
 After v3.1, scanner can rescan problem folder, if filename begin with check_word
-
+After v3.5, scanner use docker to containerization 
 
 ## Installation
 
@@ -15,35 +15,27 @@ Clone this repo to selected folder
   cd 'your folder'
   git clone https://github.com/Eniark698/scan_proj.git
 ```
-Your must have installed python version 3
+Your must have installed docker
 
-Install all necessary packages for python
-```bash
-    python.exe -m pip install -r requirements.txt
-```
+All deps will be installed in auto mode
 
-or, if you do not want to use .txt file, than
-```bash
-    pip install pyzbar
-    pip install psutil
-    pip install tendo
-    pip install Pillow
-    pip install psycopg2-binary
-    pip install psycopg2
-    pip install pywin32
-```
-and, if u are using *nix systems, than
+If you want not to use Docker, then 
 ```bash
     sudo apt-get install libzbar0 #for ubuntu
     brew install zbar #for os x
+    #The zbar DLLs are included with the Windows Python wheels
 ```
+If you see an ugly ImportError when importing pyzbar on Windows you will most likely need the Visual C++ Redistributable Packages for Visual Studio 2013. Install vcredist_x64.exe if using 64-bit Python, vcredist_x86.exe if using 32-bit Python.
 
 ## Deployment
 
 To start using move config.json to F:/proc/
 
-!Do not forget to install postres on your pc, or connect to it using network
-
+```bash
+  cd Automated-BarCode-Scanner
+  docker compose up -d --build
+```
+After v3.5 scanner use postgres from docker-compose
 
 
 
@@ -54,7 +46,7 @@ To run this project, you will need to set up path to each directories where file
 
 `days_to_remove` |`90` -- amount of date, after which photos will be deleted
 
-`path to placement of scan's folder` | `F:/proc/scan/` -- placement for files that used to be scanned
+`path to placement of scan's folder` | `["/project/scan/","/project/scanMukachevo/","/project/scanSambir/"]` -- placement for files that used to be scanned
 
 `path to placement of done folder for code128` | `F:/proc/done/` --
 placement for CODE128 scanned files
@@ -62,7 +54,7 @@ placement for CODE128 scanned files
 `path to placement of done folder for ean13 or code39` | `F:/proc/not done/` --
 placement for ean13 and code39 scanned files
 
-`path to placement of problem files's folder`| `F:/scan_proj/problem/` --
+`path to placement of problem files's folder`| `["/project/problem/","/project/problemMukachevo/","/project/problemSambir/"]` --
 placement for files that can not be scanned because it is not photos, or for files, then have errors
 
 `path to placement of log's folder`| `F:/scan_proj/logs/` --

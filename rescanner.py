@@ -1,4 +1,4 @@
-def rescan(donefolder, problemfolder, logsfolder, check_word, pattern):
+def rescan(donefolder, problemfolder, logsfolder, check_word, pattern,cur, con):
     from tendo import singleton
     from sys import exit
 
@@ -13,35 +13,14 @@ def rescan(donefolder, problemfolder, logsfolder, check_word, pattern):
     from PIL import Image
 
     Image.MAX_IMAGE_PIXELS = 100000000
-    from datetime import datetime
+    from datetime import datetime, timezone,timedelta
     from random import random, seed
     from traceback import format_exc
     import re
-
-    # connect to psql, create table if not exists
-    import psycopg2
-
-    con = psycopg2.connect(
-        host="localhost", database="postgres", user="postgres", password="frgthy"
-    )
-    # con.autocommit = True
-    cur = con.cursor()
-    cur.execute(
-        """create table if not exists scantable(
-         id varchar(200)
-        ,BarCode varchar(200)
-        ,location varchar(400)
-        ,dateandtime timestamp
-        ,storage_inbytes bigint
-        ,BarCodeType varchar(50)
-        ,direction varchar(1)
-        ,is_rescanned boolean
-        ,territory int);"""
-    )
-    con.commit()
-
+    import pytz
+    
     # unique seed for random lib
-    seed(hash(str(datetime.now())))
+    seed(hash(str(datetime.now(pytz.timezone('Europe/Kyiv')))))
 
     j = 0
     check_len = len(check_word) + 1
@@ -86,7 +65,7 @@ def rescan(donefolder, problemfolder, logsfolder, check_word, pattern):
 
                     direction = answer[-1]
                     direction = direction.lower()
-                    datn = str(datetime.now())
+                    datn = str(datetime.now(pytz.timezone('Europe/Kyiv')))
                     answer = answer[:-2]
                     name = answer + "," + h + "." + format
 
@@ -98,7 +77,7 @@ def rescan(donefolder, problemfolder, logsfolder, check_word, pattern):
                         """insert into scantable values ('{}','{}','{}','{}',{},'{}','{}','{}',{});""".format(
                             name,
                             answer,
-                            donefolder + direction + "/" + answer + "/" + name,
+                            'F:/proc/done/' + direction + "/" + answer + "/" + name,
                             datn,
                             size,
                             None,
@@ -116,10 +95,11 @@ def rescan(donefolder, problemfolder, logsfolder, check_word, pattern):
 
                     # copy file into folder
                     try:
-                        move(
+                        copy(
                             problemfolder[iter] + str(i),
                             donefolder + direction + "/" + answer + "/" + name,
                         )
+                        remove(problemfolder[iter] + str(i))
                     except:
                         con.rollback()
                         continue
@@ -143,8 +123,4 @@ def rescan(donefolder, problemfolder, logsfolder, check_word, pattern):
 
     # exit
     print(j, " files was rescanned")
-    try:
-        cur.close()
-        con.close()
-    except:
-        pass
+  

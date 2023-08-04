@@ -1,4 +1,4 @@
-def scan(scanfolder, donefolder, oldfolder, problemfolder, logsfolder, delay, pattern):
+def scan(scanfolder, donefolder, oldfolder, problemfolder, logsfolder, delay, pattern, cur, con):
     # exit from another instance, if two times script was started
     from tendo import singleton
     from sys import exit
@@ -17,37 +17,24 @@ def scan(scanfolder, donefolder, oldfolder, problemfolder, logsfolder, delay, pa
     Image.MAX_IMAGE_PIXELS = 100000000
     from pyzbar import pyzbar
     from time import time
-    from datetime import datetime, timedelta
+    from datetime import datetime, timedelta,timezone
     from random import random, seed
     from traceback import format_exc
     import re
+    import pytz
 
     failed = 0
 
-    # connect to psql, create table if not exists
-    import psycopg2
 
-    con = psycopg2.connect(
-        host="localhost", database="postgres", user="postgres", password="frgthy"
-    )
-    # con.autocommit = True
-    cur = con.cursor()
-    cur.execute(
-        """create table if not exists scantable(
-         id varchar(200)
-        ,BarCode varchar(200)
-        ,location varchar(400)
-        ,dateandtime timestamp
-        ,storage_inbytes bigint
-        ,BarCodeType varchar(50)
-        ,direction varchar(1)
-        ,is_rescanned boolean
-        ,territory int);"""
-    )
-    con.commit()
+
+    
+
+    
+
+    
 
     # unique seed for random lib
-    seed(hash(str(datetime.now())))
+    seed(hash(str(datetime.now(pytz.timezone('Europe/Kyiv')))))
 
     total, j, Mem = 0, 0, []
 
@@ -59,10 +46,12 @@ def scan(scanfolder, donefolder, oldfolder, problemfolder, logsfolder, delay, pa
             for i in list:
                 start_time = time()
 
-                now_date = datetime.now()
+                now_date = datetime.now(pytz.timezone('Europe/Kyiv'))
+                
+
                 delta = timedelta(minutes=delay)
                 c_time = datetime.fromtimestamp(
-                    path.getmtime(scanfolder[iter] + str(i))
+                    path.getmtime(scanfolder[iter] + str(i)), pytz.timezone("Europe/Kyiv")
                 )
                 if now_date - c_time > delta:
                     pass
@@ -133,7 +122,7 @@ def scan(scanfolder, donefolder, oldfolder, problemfolder, logsfolder, delay, pa
                             """insert into scantable values ('{}','{}','{}','{}',{},'{}','{}','{}',{});""".format(
                                 name,
                                 answer,
-                                donefolder + direction + "/" + answer + "/" + name,
+                                'F:/proc/done/' + direction + "/" + answer + "/" + name,
                                 datn,
                                 str(size),
                                 typecode,
@@ -256,10 +245,4 @@ def scan(scanfolder, donefolder, oldfolder, problemfolder, logsfolder, delay, pa
     #         f.close()
 
     print('Scanned: ',j)
-    
-    # exit
-    try:
-        cur.close()
-        con.close()
-    except:
-        pass
+   

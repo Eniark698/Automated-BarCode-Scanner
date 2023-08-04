@@ -1,4 +1,4 @@
-def remove(days,  donefolder,logsfolder):
+def remove(days,  donefolder,logsfolder,cur, con):
     from datetime import datetime
     from os import listdir
     import os.path as path
@@ -32,25 +32,7 @@ def remove(days,  donefolder,logsfolder):
             if abs(days_between(now_date,c_time))>=days:
                 rmtree(donefolder + 'n/' + i)
                 j+=1
-        import psycopg2
-        con = psycopg2.connect(
-        host="localhost",
-        database="postgres",
-        user="postgres",
-        password="frgthy")
-
-        cur = con.cursor()
-        cur.execute("""create table if not exists scantable(
-         id varchar(200) 
-        ,BarCode varchar(200)
-        ,location varchar(400)
-        ,dateandtime timestamp
-        ,storage_inbytes bigint
-        ,BarCodeType varchar(50)
-        ,direction varchar(1)
-        ,is_rescanned boolean
-        ,territory int);""")
-        con.commit()
+        
         
         cur.execute("""delete from scantable where DATE_PART('days', NOW()-dateandtime)>={};""".format(days))
         con.commit()
@@ -66,11 +48,5 @@ def remove(days,  donefolder,logsfolder):
         f.close()
 
 
-    #exit
-    try:
-        cur.close()
-        con.close()
-    except:
-        pass
 
     print(j, ' files was removed')

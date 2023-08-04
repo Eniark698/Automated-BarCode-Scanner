@@ -1,18 +1,16 @@
 {
     "_comment":"WHEN WRITING NEW PATH, REMEMBER TO ADD / AT THE END",
+    "_comment_":"/project/ is F:/proc/",
 
-
-    "path":"F:/proc/",
     "days_to_remove":90,
     "delay to scan file":5,
-    "repeat time between two executions of script":5,
+    "repeat time in minutes between two executions of script":5,
     "check_word":"IRIS",
 
-
-    "path to placement of scan`s folder": ["F:/proc/scan/","F:/proc/scanMukachevo/","F:/proc/scanSambir/"],
-    "path to placement of done folder for code128": "F:/proc/done/",
-    "path to placement of done folder for ean13 or code39": "F:/proc/not done/",
-    "path to placement of problem files`s folder": ["F:/proc/problem/","F:/proc/problemMukachevo/","F:/proc/problemSambir/"],
-    "path to placement of log`s folder": "F:/proc/logs/"
+    "path to placement of scan`s folder": ["/project/scan/","/project/scanMukachevo/","/project/scanSambir/"],
+    "path to placement of done folder for code128": "/project/done/",
+    "path to placement of done folder for ean13 or code39": "/project/not done/",
+    "path to placement of problem files`s folder": ["/project/problem/","/project/problemMukachevo/","/project/problemSambir/"],
+    "path to placement of log`s folder": "/project/logs/"
     
 }
