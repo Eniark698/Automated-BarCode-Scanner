@@ -1,5 +1,5 @@
 # Use an official Ubuntu runtime as a parent image
-FROM python:3.11.4-slim-bullseye
+FROM python:3.11.5-slim-bullseye
 
 # Set the working directory in the container to /app
 WORKDIR /app
@@ -13,8 +13,8 @@ libzbar0  supervisor \
  && rm -rf /var/lib/apt/lists/*
 
 # Install any needed packages specified in requirements.txt
-RUN pip3 install --no-cache-dir tendo pyzbar psycopg2-binary psutil Pillow pytz streamlit plotly matplotlib 
-
+RUN pip3 install --no-cache-dir tendo pyzbar psycopg2-binary psutil Pillow pytz streamlit plotly pydeck
+#RUN pip3 install --no-cache-dir folium folium_static
 EXPOSE 8501
 
 #RUN  streamlit run /app/dashboard.py --server.port 8501 --server.baseUrlPath /scanner/dashboard/ --server.enableCORS false --server.enableXsrfProtection false

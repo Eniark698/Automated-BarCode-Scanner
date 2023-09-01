@@ -20,7 +20,7 @@ def connect():
         ,BarCodeType varchar(50)
         ,direction varchar(1)
         ,is_rescanned boolean
-        ,territory int);"""
+        ,territory varchar(100));"""
     )
     con.commit()
     return cur, con

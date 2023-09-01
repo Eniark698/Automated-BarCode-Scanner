@@ -44,6 +44,35 @@ def scan(scanfolder, donefolder, oldfolder, problemfolder, logsfolder, delay, pa
             # get list of files in scanfoler
             list = listdir(scanfolder[iter])
             for i in list:
+
+                match iter:
+
+                    case 0:
+                        ter='Lviv'
+                    case 1:
+                        ter='Mukachevo'
+                    case 2:
+                        ter='Sambir'
+                    case 3:
+                        ter='Ternopil'
+                    case 4:
+                        ter='Vinnytsia'
+                    case 5:
+                        ter='Zhytomyr'
+                    case 6:
+                        ter='Rivne'
+                    case 7:
+                        ter='Lutsk'
+                    case 8:
+                        ter='Khmelnytskyi'
+                    case 9:
+                        ter='Frankivsk'
+                    case 10:
+                        ter='Chernivtsi'
+                    
+
+
+
                 start_time = time()
 
                 now_date = datetime.now(pytz.timezone('Europe/Kyiv'))
@@ -119,7 +148,7 @@ def scan(scanfolder, donefolder, oldfolder, problemfolder, logsfolder, delay, pa
 
                         # insert all info about scan in DB
                         cur.execute(
-                            """insert into scantable values ('{}','{}','{}','{}',{},'{}','{}','{}',{});""".format(
+                            """insert into scantable values ('{}','{}','{}','{}',{},'{}','{}','{}','{}');""".format(
                                 name,
                                 answer,
                                 'F:/proc/done/' + direction + "/" + answer + "/" + name,
@@ -128,7 +157,7 @@ def scan(scanfolder, donefolder, oldfolder, problemfolder, logsfolder, delay, pa
                                 typecode,
                                 direction,
                                 False,
-                                iter,
+                                ter,
                             )
                         )
 

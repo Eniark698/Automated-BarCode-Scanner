@@ -32,6 +32,32 @@ def rescan(donefolder, problemfolder, logsfolder, check_word, pattern,cur, con):
             # get all filenames in problem folder
             list = listdir(problemfolder[iter])
 
+            match iter:
+
+                case 0:
+                    ter='Lviv'
+                case 1:
+                    ter='Mukachevo'
+                case 2:
+                    ter='Sambir'
+                case 3:
+                    ter='Ternopil'
+                case 4:
+                    ter='Vinnytsia'
+                case 5:
+                    ter='Zhytomyr'
+                case 6:
+                    ter='Rivne'
+                case 7:
+                    ter='Lutsk'
+                case 8:
+                    ter='Khmelnytskyi'
+                case 9:
+                    ter='Frankivsk'
+                case 10:
+                    ter='Chernivtsi'
+
+
             for i in list:
                 size = None
 
@@ -74,7 +100,7 @@ def rescan(donefolder, problemfolder, logsfolder, check_word, pattern,cur, con):
 
                     # insert into DB
                     cur.execute(
-                        """insert into scantable values ('{}','{}','{}','{}',{},'{}','{}','{}',{});""".format(
+                        """insert into scantable values ('{}','{}','{}','{}',{},'{}','{}','{}','{}');""".format(
                             name,
                             answer,
                             'F:/proc/done/' + direction + "/" + answer + "/" + name,
@@ -83,7 +109,7 @@ def rescan(donefolder, problemfolder, logsfolder, check_word, pattern,cur, con):
                             None,
                             direction,
                             True,
-                            iter,
+                            ter,
                         )
                     )
 

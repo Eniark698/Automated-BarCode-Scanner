@@ -1,192 +1,39 @@
-def Monitoring():
-
-    def get_system_info():
-        cpu_percent = psutil.cpu_percent()
-        memory_info = psutil.virtual_memory()
-        memory_total = memory_info.total / (1024.0 ** 3)  # convert bytes to GB
-        memory_used = memory_info.used / (1024.0 ** 3)
-        memory_percent = memory_info.percent
-
-        total, used, free = shutil.disk_usage("F:")
-        total=total // (2**30)
-        used=used // (2**30)
-        free=free // (2**30)
-        return cpu_percent, memory_total, memory_used, memory_percent, total, used, free
-
-    #header
-    st.markdown("""
-    <style>
-    .big-font {
-    font-size:50px !important;
-    }
-    </style>
-    """, unsafe_allow_html=True)
-
-    st.markdown('<p class="big-font">😃 Scanner Monitoring Dashboard 😃</p>', unsafe_allow_html=True)
-
-    cpu_placeholder = st.empty()
-
-    # Use columns for memory and storage placeholders
-    mem_storage_col1, mem_storage_col2 = st.columns(2)
-    memory_placeholder = mem_storage_col1.empty()
-    storage_placeholder = mem_storage_col2.empty()
-
-    #refresh page
-    while True:
-        cpu_percent, memory_total, memory_used, memory_percent, total, used, free = get_system_info()
-        cpu_placeholder.metric(label="🖥️ CPU Usage 🖥️", value=f"{cpu_percent}%", delta=None)
-        memory_placeholder.metric(label="🧠 RAM Usage 🧠", value=f"{memory_used:.2f} GB / {memory_total:.2f} GB", delta=f"{memory_percent}%")
-        storage_placeholder.metric(label="💽 ROM Usage 💽", value=f"{used:.2f} GB / {total:.2f} GB", delta=f"{free} GB")
-
-        # Set a delay between loops
-        time.sleep(2)
-
-
-def mapping_demo():
-    
-
-    st.markdown(f"# {list(page_names_to_funcs.keys())[3]}")
-    st.write(
-        """
-        This demo shows how to use
-[`st.pydeck_chart`](https://docs.streamlit.io/library/api-reference/charts/st.pydeck_chart)
-to display geospatial data.
-"""
-    )
-
-    @st.cache_data
-    def from_data_file(filename):
-        url = (
-            "http://raw.githubusercontent.com/streamlit/"
-            "example-data/master/hello/v1/%s" % filename
-        )
-        return pd.read_json(url)
-
-    try:
-        ALL_LAYERS = {
-            "Bike Rentals": pdk.Layer(
-                "HexagonLayer",
-                data=from_data_file("bike_rental_stats.json"),
-                get_position=["lon", "lat"],
-                radius=200,
-                elevation_scale=4,
-                elevation_range=[0, 1000],
-                extruded=True,
-            ),
-            "Bart Stop Exits": pdk.Layer(
-                "ScatterplotLayer",
-                data=from_data_file("bart_stop_stats.json"),
-                get_position=["lon", "lat"],
-                get_color=[200, 30, 0, 160],
-                get_radius="[exits]",
-                radius_scale=0.05,
-            ),
-            "Bart Stop Names": pdk.Layer(
-                "TextLayer",
-                data=from_data_file("bart_stop_stats.json"),
-                get_position=["lon", "lat"],
-                get_text="name",
-                get_color=[0, 0, 0, 200],
-                get_size=15,
-                get_alignment_baseline="'bottom'",
-            ),
-            "Outbound Flow": pdk.Layer(
-                "ArcLayer",
-                data=from_data_file("bart_path_stats.json"),
-                get_source_position=["lon", "lat"],
-                get_target_position=["lon2", "lat2"],
-                get_source_color=[200, 30, 0, 160],
-                get_target_color=[200, 30, 0, 160],
-                auto_highlight=True,
-                width_scale=0.0001,
-                get_width="outbound",
-                width_min_pixels=3,
-                width_max_pixels=30,
-            ),
-        }
-        st.sidebar.markdown("### Map Layers")
-        selected_layers = [
-            layer
-            for layer_name, layer in ALL_LAYERS.items()
-            if st.sidebar.checkbox(layer_name, True)
-        ]
-        if selected_layers:
-            st.pydeck_chart(
-                pdk.Deck(
-                    map_style="mapbox://styles/mapbox/light-v9",
-                    initial_view_state={
-                        "latitude": 37.76,
-                        "longitude": -122.4,
-                        "zoom": 11,
-                        "pitch": 50,
-                    },
-                    layers=selected_layers,
-                )
-            )
-        else:
-            st.error("Please choose at least one layer above.")
-    except URLError as e:
-        st.error(
-            """
-            **This demo requires internet access.**
-
-            Connection error: %s
-        """
-            % e.reason
-        )
-
-def Plot():
-
-    st.markdown(f'# {list(page_names_to_funcs.keys())[1]}')
-    st.write(
-        """
-        This page illustrates a combination of plotting and animation. We're generating a bunch of number of documents per date in a loop. Enjoy!
-"""
-    )
-
-    progress_bar = st.sidebar.progress(0)
-    status_text = st.sidebar.empty()
-    
-    st.line_chart(df_time)
-
-    progress_bar.empty()
-    col1, col2 = st.columns([1, 1])
-    with col1:
-        st.write('Today was scanned: ', today_date)
-    with col2:
-        st.write('Yesterday and today was scanned: ', yesterday_date)
-
-    # Streamlit widgets automatically run the script from top to bottom. Since
-    # this button is not connected to any other logic, it just causes a plain
-    # rerun.
-    st.button("Re-run")
-
-
 def DateFrame():
-    global df
-    if "default" not in st.session_state:
-        st.session_state["default"] = ["",[year_start,year_end] ]
-    
+    df = get_data_dataframe()
 
-    zero_time = datetime.min.time()
-    one_time = datetime.max.time()
+    if "default" not in st.session_state:
+        st.session_state["default"] = ["Lviv"] 
+    if 'date_input' not in st.session_state:
+        st.session_state['date_input'] = [monday, sunday]
+    if 'disable_opt' not in st.session_state:
+        st.session_state.disable_opt = False
+
+    
     st.markdown(f"# {list(page_names_to_funcs.keys())[0]}")
     st.write(
         """
-        This page shows info about scanned files in time by territories
+        Ця сторінка показує інформацію щодо просканованих файлів в часі по територіях.
         """
     )
 
-    
 
-
+    all = st.checkbox("Вибрати усі регіони")
     
-    all = st.checkbox("Select all regions")
-    territories = st.multiselect(
-        "Choose territories", list(df.territory.unique()), ["Lviv"]
-    )
     if all:
+        st.session_state.disable_opt = True
+
         territories=list(df.territory.unique())
+        st.session_state["default"]= territories
+    else:
+        st.session_state["default"] = ['Lviv']
+        territories=['Lviv']
+        st.session_state.disable_opt = False
+
+
+    territories = st.multiselect(
+        "Вибрати регіони", list(df.territory.unique()), st.session_state["default"], disabled = st.session_state.disable_opt
+    )
+    
 
     filters['territory']=territories
 
@@ -199,21 +46,34 @@ def DateFrame():
             df = df[df[col] == value]
 
 
-    time_input=st.date_input('Choose date limits:', st.session_state["default"][1])
+    time_input=st.date_input('Вибрати часові межі:', st.session_state["date_input"], format='DD/MM/YYYY')
+
+    st.session_state['date_input'] = time_input
+
+    button=st.button('Очистити часовий фільтр')
     
-    button=st.button('Clear dates')
-    
-    
-    
+ 
     if button:
-        st.session_state["default"][1]=[year_start,year_end]
+        st.session_state['date_input'] = ()
+        # st.session_state["default"][0]=[]
         filters['dateandtime']='All'
-        st.session_state["default"][0]="**:blue[Done]**"
         st.experimental_rerun()
         #st.date_input('Choose date limits:', [])=[]
 
+    
+    
     if len(time_input)!=2: 
-        pass
+        
+        try:
+            mask = (df['dateandtime'] > datetime.combine(time_input[0], zero_time))
+            df=df.loc[mask]
+        except:
+            try:
+                mask =  (df['dateandtime'] <= datetime.combine(time_input[1], one_time))
+                df=df.loc[mask]
+            except:
+                pass
+        
     else:
         start_date, end_date = time_input
         if start_date <= end_date:
@@ -223,8 +83,7 @@ def DateFrame():
         mask = (df['dateandtime'] > datetime.combine(start_date, zero_time)) & (df['dateandtime'] <= datetime.combine(end_date, one_time))
         df=df.loc[mask]
 
-    st.write("### Table of scanned documents", df)
-
+   
     for col, value in filters.items():
         if value == 'All':  # Skip if value is 'All'
             continue
@@ -233,20 +92,103 @@ def DateFrame():
         else:  # Otherwise, use equality
             df = df[df[col] == value]
 
+
+    st.write("### Таблиця просканованих документів", df)
+
+    cols_numbers=st.columns([1,1])
+    with cols_numbers[0]:
+        try:
+            st.write('Сторінок : ', df['id'].nunique())
+        except:
+            st.write('Сторінок : ', df['id'].loc[mask].nunique())
+    with cols_numbers[1]:
+        try:
+            st.write('Документів: ', df['barcode'].nunique())
+        except:
+            st.write('Документів: ', df['barcode'].loc[mask].nunique())
+
+            
+
+    cols = st.columns([1, 1])
+
+    
+
     if df.empty==True:
-        pass
+            pass
     else:
-        sizes=list(df.territory[df['territory']==territories[i]].count() for i in range(len(territories)))
+        with cols[0]:
+                df_drop = df.drop_duplicates(subset='barcode', keep='first')
+                sizes=list(df_drop.territory[df_drop['territory']==territories[i]].count() for i in range(len(territories)))
 
-        
-        fig1, ax1 = plt.subplots()
-        ax1.pie(sizes,  labels=territories, autopct='%1.1f%%',
-                shadow=True, startangle=90)
-        ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+                # fig1, ax1 = plt.subplots()
+                # ax1.pie(sizes,  labels=territories, autopct='%1.1f%%',
+                #         shadow=True, startangle=90)
+                # ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
 
-        st.pyplot(fig1)
-        
-   
+                # st.pyplot(fig1)
+                # Create a new DataFrame for plotting
+                df_pie = pd.DataFrame({
+                    'Територія': territories,
+                    'Кількість': sizes
+                })
+
+                # Create pie chart using Plotly Express
+                fig1 = px.pie(df_pie, names='Територія', values='Кількість', 
+                            title='Поширення листків по територіях',
+                            hover_name='Територія', hover_data=['Кількість'])
+                # fig1.update_layout(
+                #     margin=dict(t=50, b=50, l=50, r=50),
+                #     legend=dict(x=1.05, y=0.5, orientation='v')
+                # )
+                fig1.update_layout(showlegend=False)
+
+
+                # Display the pie chart in Streamlit
+                st.plotly_chart(fig1, config={'displayModeBar': True, 'modeBarButtonsToRemove': ['pan2d','select2d','lasso2d'], 'displaylogo': False, 'modeBarButtonsToAdd': ['resetScale2d'], 'modeBarButtonsPosition': 'left'})
+
+           
+
+            
+        with cols[1]:
+            sizes=list(df.territory[df['territory']==territories[i]].count() for i in range(len(territories)))
+
+            # fig1, ax1 = plt.subplots()
+            # ax1.pie(sizes,  labels=territories, autopct='%1.1f%%',
+            #         shadow=True, startangle=90)
+            # ax1.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
+
+            # st.pyplot(fig1)
+            # Create a new DataFrame for plotting
+            df_pie = pd.DataFrame({
+                'Територія': territories,
+                'Кількість': sizes
+            })
+
+            # Create pie chart using Plotly Express
+            fig2 = px.pie(df_pie, names='Територія', values='Кількість', 
+                        title='Поширення документів по територіях',
+                        hover_name='Територія', hover_data=['Кількість'])
+            # fig2.update_layout(
+            #     margin=dict(t=50, b=50, l=50, r=50),
+            #     legend=dict(x=1.05, y=0.5, orientation='v')
+            # )
+            # Display the pie chart in Streamlit
+
+            fig2.update_layout(
+                legend=dict(
+                    x=0,
+                    y=1,
+                    xanchor="left",
+                    yanchor="top"
+                )
+            )
+            st.plotly_chart(fig2, config={'displayModeBar': True, 'modeBarButtonsToRemove': ['pan2d','select2d','lasso2d'], 'displaylogo': False, 'modeBarButtonsToAdd': ['resetScale2d'], 'modeBarButtonsPosition': 'left'})
+
+
+        #fig = px.pie(sizes, values='id', names='territory', title='Population of European continent')
+
+
+    
    
         #st.dataframe(df)
 
@@ -266,75 +208,473 @@ def DateFrame():
         # st.altair_chart(chart, use_container_width=True)
 
 
+
+def GeospatialAnalysis():
+    df=get_data_dataframe()
+    st.markdown(f"# {list(page_names_to_funcs.keys())[2]}")
+    st.write("Ця сторінка показує візуалізації карти розподілення документів по територіях (за весь час)")
+    
+    
+    
+    
+    # locations should be generated from your actual data source
+    locations = pd.DataFrame({
+        'territory': ['Lviv', 'Mukachevo', 'Sambir', 'Ternopil', 'Vinnytsia', 'Zhytomyr', 'Rivne', 'Lutsk', 'Khmelnytskyi', 'Frankivsk', 'Chernivtsi'],
+        'lat': [49.842957, 48.262108, 49.310588, 49.553516, 49.135801, 50.155353, 50.619900, 50.453355, 49.251780, 48.551740, 48.172936],
+        'lon': [24.031111, 22.430404, 23.115107, 25.594767, 28.285149, 28.403608, 26.251617, 25.203278, 26.594751, 24.423499, 25.562522]
+    })
+    
+    # Merge the df and locations dataframes on the 'territory' column
+    df_drop = df.drop_duplicates(subset='barcode', keep='first')
+
+    counts = df_drop.groupby('territory')['barcode'].count().reset_index()
+    
+    counts.columns = ['territory', 'count']
+
+    data = pd.merge(counts, locations, on='territory')
+    data['scaled_count'] = data['count'].apply(lambda x: np.log(x + 1))
+
+    #data.rename({'count':'Amount of documents'}, inplace=True)
+    col1,col2=st.columns([1,1])
+    sum=data['count'].sum()
+    data['percentage']=round(data['count']/sum,2)*100
+    data['formatted_count'] = data['count'].apply(lambda x: "{:,.2f}".format(x).replace(',', ' ').replace('.', ',')[:-3])
+
+    data.rename(columns={'territory':'Територія','count': 'Кількість', 'scaled_count':'Маштабована кількість', 'lat': 'Широта', 'lon': 'Довгота', 'percentage':'Відсоток кількості'}, inplace=True)
+    with col1:
+        st.dataframe(data[['Територія','Кількість','Відсоток кількості']])
+    st.markdown("""
+    <style>
+    .big-card {
+        background-color: #f9f9f9;
+        border-radius: 15px;
+        padding: 20px;
+        margin: 10px 0px;
+        box-shadow: 2px 2px 12px grey;
+        font-size: 14px;
+        color: #4a4a4a;
+        font-family: Arial, sans-serif;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+    with col2:
+        st.markdown(f"<div class='big-card'><b>Документів було проскановано:</b> {df['barcode'].nunique():,}</div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='big-card'><b>Сторінок було проскановано:</b> {df['id'].nunique():,}</div>", unsafe_allow_html=True)
+        st.markdown(f"<div class='big-card'><b>Середня кількість сторінок на документ:</b> {df['id'].nunique()/df['id'].nunique():,}</div>", unsafe_allow_html=True)
+
+    data.rename(columns={'Територія':'territory','Кількість': 'count', 'Маштабована кількість':'scaled_count', 'Широта': 'lat', 'Довгота': 'lon','Відсоток кількості':'percentage'}, inplace=True)
+
+    
+    
+    # m = folium.Map(location=[49.5, 24.0], zoom_start=7, tiles='cartodb positron')
+    # # Define a color palette
+    # colors = ['blue', 'green', 'red', 'purple', 'orange', 'darkred']
+    
+    # for i, (lat, lon, scaled_count, count, territory) in enumerate(zip(data['lat'], data['lon'], data['scaled_count'], data['count'], data['territory'])):
+    #     folium.CircleMarker(
+    #         location=[lat, lon],
+    #         radius=scaled_count * 3,  # scale up the size for better visibility
+    #         popup=f'<i>{territory}</i><br>Кількість: <b>{count}</b> <br> Відсоток кількості: <b>{round(count/sum,2)}</b>',
+    #         color=colors[i % len(colors)],  # cycle through colors
+    #         fill=True,
+    #         fill_color=colors[i % len(colors)],
+    #         fill_opacity=0.6,  # set fill opacity
+    #         line_opacity=0.9,
+    #     ).add_to(m)
+    
+    # # Display the map in Streamlit
+    # folium_static(m, width=1000)  # set the width to 1000 pixels
+
+    def assign_color(index):
+        colors = {
+        'blue': [0, 0, 255, 200],
+        'green': [0, 128, 0, 200],
+        'red': [255, 0, 0, 200],
+        'purple': [128, 0, 128, 200],
+        'orange': [255, 165, 0, 200],
+        'darkred': [139, 0, 0, 200]
+        }
+        color_names = list(colors.keys())
+        return colors[color_names[index % len(color_names)]]
+        
+    data['color']=data.index.map(assign_color)
+    # ... [Your previous code here]
+
+    # Use Pydeck for more customization
+    view_state = pdk.ViewState(
+        latitude=50,
+    longitude=28.00,
+    zoom=5.9,
+    pitch=0,
+    )
+    layer = pdk.Layer(
+    'ScatterplotLayer',
+    data=data,
+    get_position='[lon, lat]',
+    get_fill_color='color',
+    get_radius='scaled_count * 2100',  # Adjust size of circle based on count of documents
+    pickable=True,
+    extruded=True,
+    )
+
+    tooltip = {
+    "html": "<b>{territory}</b><br>Кількість: {formatted_count}<br>Відсоток кількості: {percentage}",
+    "style": {
+        "backgroundColor": "steelblue",
+        "color": "white"
+    }
+    }
+
+    st.pydeck_chart(pdk.Deck(
+    map_style='mapbox://styles/mapbox/light-v9',
+    initial_view_state=view_state,
+    layers=[layer],
+    tooltip=tooltip
+    ))
+
+    st.button("Перезавантажити")
+
+
+def Plot():
+    df_time,df_time_all,final_data=get_data_chart()
+    df = get_data_dataframe()
+    df_time=final_data#.set_index('ds')
+    df_time_all=df_time_all#.set_index('ds')
+
+    cursor.execute('select count(*) from scantable where dateandtime::date >=now()::date;')
+    today_date = cursor.fetchone()[0]
+    cursor.execute("select count(*) from scantable where dateandtime::date >=(now()- interval '1 day')::date;")
+    yesterday_date = cursor.fetchone()[0]
+
+    st.markdown(f'# {list(page_names_to_funcs.keys())[1]}')
+    st.write(
+        """
+        Ця сторінка ілюструє комбінацію лінійного графіку та гістограми. 
+        """
+    )
+    
+    if "default_plot" not in st.session_state:
+        st.session_state["default_plot"] = "Lviv"
+    if 'disable_opt_plot' not in st.session_state:
+        st.session_state.disable_opt = False
+    if 'date_input_plot' not in st.session_state:
+        st.session_state['date_input_plot'] = [   ]
+
+    #progress_bar = st.sidebar.progress(0)
+    #status_text = st.sidebar.empty()
+    
+    all = st.checkbox("Вибрати усі регіони")
+    
+    if all:
+        st.session_state.disable_opt = True
+
+        
+    else:
+        st.session_state["default_plot"] = 'Lviv'
+        territories='Lviv'
+        st.session_state.disable_opt = False
+
+    
+    
+    territories = st.selectbox(
+        "Вибрати територію", df_time.territory.unique(), index=list(df.territory.unique()).index(st.session_state["default_plot"]), disabled = st.session_state.disable_opt
+    )
+    st.session_state["default_plot"] = territories
+    
+    
+
+    
+    filters_plot['territory']=[territories]
+
+    
+    time_input=st.date_input('Вибрати часові межі:', st.session_state["date_input_plot"], format='DD/MM/YYYY')
+
+    st.session_state['date_input_plot'] = time_input
+
+    button=st.button('Очистити часовий фільтр')
+    
+ 
+    if button:
+        st.session_state['date_input_plot'] = ()
+        # st.session_state["default"][0]=[]
+        filters_plot['ds']='All'
+        st.experimental_rerun()
+        #st.date_input('Choose date limits:', [])=[]
+
+    
+    
+    if len(time_input)!=2: 
+        
+        try:
+            mask = (df_time['ds'] > datetime.combine(time_input[0], zero_time))
+            df_time=df_time.loc[mask]
+            mask_all = (df_time_all['ds'] > datetime.combine(time_input[0], zero_time))
+            df_time_all=df_time_all.loc[mask_all]
+        except:
+            try:
+                mask =  (df_time['ds'] <= datetime.combine(time_input[1], one_time))
+                df_time=df_time.loc[mask]
+                mask_all =  (df_time_all['ds'] <= datetime.combine(time_input[1], one_time))
+                df_time_all=df_time_all.loc[mask_all]
+            except:
+                pass
+        
+    else:
+        start_date, end_date = time_input
+        if start_date <= end_date:
+            pass
+        else:
+            st.error('Error: DateStart is greater then DateEnd.')
+        mask = (df_time['ds'] > datetime.combine(start_date, zero_time)) & (df_time['ds'] <= datetime.combine(end_date, one_time))
+        df_time=df_time.loc[mask]
+        mask_all = (df_time_all['ds'] > datetime.combine(start_date, zero_time)) & (df_time_all['ds'] <= datetime.combine(end_date, one_time))
+        df_time_all=df_time_all.loc[mask_all]
+
+
+
+
+
+
+    for col, value in filters_plot.items():
+        if value == 'All':  # Skip if value is 'All'
+            continue
+        elif isinstance(value, list):  # If the value is a list, use isin
+            df_time = df_time[df_time[col].isin(value)]
+        else:  # Otherwise, use equality
+            df_time = df_time[df_time[col] == value]
+
+    for col, value in filters_plot_all.items():
+        if value == 'All':  # Skip if value is 'All'
+            continue
+        elif isinstance(value, list):  # If the value is a list, use isin
+            df_time_all = df_time_all[df_time_all[col].isin(value)]
+        else:  # Otherwise, use equality
+            df_time_all = df_time_all[df_time_all[col] == value]
+
+    
+    df_time=df_time.set_index('ds')
+    df_time_all=df_time_all.set_index('ds')
+
+    try:
+        # Removing leading zeros
+        df_time = df_time.loc[(df_time['y'] != 0).idxmax():]
+
+        # Removing trailing zeros
+        df_time = df_time.loc[:df_time.loc[df_time['y'] != 0].index[-1]]
+    except:
+        df_time=pd.DataFrame({})
+    #progress_bar.empty()
+
+    if df_time.empty == True or df_time_all.empty == True:
+        st.error('У вибраних фільтрах немає даних', icon="🚨")
+    else:
+        if all:
+            
+            fig = px.line(df_time_all, x=df_time_all.index, y='y', title='Кількість документів по днях', markers=True)
+
+            fig.update_traces(line=dict(width=6, color='#87bc45'), hoverlabel=dict(font_size=16))
+
+            fig.update_xaxes(title_text='Дата', tickformat='%d-%m-%Y')
+            fig.update_yaxes(title_text='Кількість документів')
+            fig.update_traces(hovertemplate='Дата: %{x}<br>Документів: %{y}')
+
+            st.plotly_chart(fig)
+
+            df_time_all.drop(columns=['territory'], inplace=True)
+
+            fig2 = px.histogram(y=df_time_all['y'], x=df_time_all.index, nbins=365,
+                                title='Кількість документів по днях',
+                                labels={'x': 'Date', 'sum of Number of Documents': 'Number of Documents'})
+            fig2.update_yaxes(title_text='Кількість документів')
+            fig2.update_xaxes(tickformat='%d-%m-%Y')
+
+            fig2.update_traces(marker=dict(color='blue', line=dict(color='#87bc45', width=4)),
+                   hoverlabel=dict(font_size=16),
+                  hovertemplate='Дата: %{x}<br>Документів: %{y}')
+
+
+
+            st.plotly_chart(fig2)
+        else:
+            fig = px.line(df_time, x=df_time.index, y='y', title='Кількість документів по днях', markers=True)
+
+            fig.update_traces(line=dict(width=6, color='#87bc45'), hoverlabel=dict(font_size=16))
+
+            fig.update_xaxes(title_text='Дата', tickformat='%d-%m-%Y')
+            fig.update_yaxes(title_text='Кількість документів')
+            fig.update_traces(hovertemplate='Дата: %{x}<br>Документів: %{y}')
+
+            st.plotly_chart(fig)
+
+
+
+
+            fig1 = px.histogram(y=df_time['y'], x=df_time.index, nbins=365, title='Кількість документів по днях',
+                                labels={'x': 'Дата', 'y': 'Кількість документів'})
+            fig1.update_yaxes(title_text='Кількість документів')
+            fig1.update_xaxes(tickformat='%d-%m-%Y')
+
+            fig1.update_traces(marker=dict(color='blue', line=dict(color='#87bc45', width=4)),
+                   hoverlabel=dict(font_size=16),
+                  hovertemplate='Дата: %{x}<br>Документів: %{y}')
+
+
+            st.plotly_chart(fig1)
+    
+
+
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        st.write('Сьогодні було проскановано: ', today_date)
+    with col2:
+        st.write('Вчора та сьогодні було проскановано: ', yesterday_date)
+
+    # Streamlit widgets automatically run the script from top to bottom. Since
+    # this button is not connected to any other logic, it just causes a plain
+    # rerun.
+    st.button("Перезавантажити")
+
+
+
+
+
 import warnings
 warnings.filterwarnings("ignore")
 from datetime import date
-from datetime import datetime
-import matplotlib.pyplot as plt
-import pydeck as pdk
-from urllib.error import URLError
+from datetime import datetime, timedelta
 import streamlit as st
-import psutil
-import time
-import shutil
+#import time
 import pandas as pd
 import numpy as np
+import plotly.express as px
+#import folium
+#from streamlit_folium import folium_static
+import pydeck as pdk
+
+# Set the layout to wide mode
+st.set_page_config(layout='wide')
+
+
 from PsqlConnect import connect
-global con, cursor, df, df_time, filters , year_start , year_end, today_date, yesterday_date
-_ , con= connect()
+global con, cursor, monday, sunday, zero_time, one_time
+
+
+@st.cache_resource(show_spinner="Утворення з'єднання до бази PSQL...")
+def psqlconnection():
+    _ , con= connect()
+    return con
+
+
+con=psqlconnection()
 cursor = con.cursor()
+
+
+
 epoch_year = date.today().year
-year_start = date(epoch_year, 1, 1)
-year_end = date(epoch_year, 12, 31)
+
+year_start = date(epoch_year, 1, 1)#.strftime('%d/%m/%Y')
+year_end = date(epoch_year, 12, 31)#.strftime('%d/%m/%Y')
+
+now=datetime.now()
+monday = now - timedelta(days = now.weekday())
+sunday = monday + timedelta(days = 6)
+zero_time = datetime.min.time()
+one_time = datetime.max.time()
+monday=datetime.combine(monday, zero_time)#.strftime('%d/%m/%Y, %H:%M:%S')
+sunday=datetime.combine(sunday, one_time)#.strftime('%d/%m/%Y, %H:%M:%S')
 
 
 
 
-@st.cache_data
-def get_data():
-    df=pd.read_sql_query("""SELECT * FROM scantable order by dateandtime desc --limit 10000""", con)
-    df['territory'].replace([0,1,2], ['Lviv', 'Mukachevo','Sambir'], inplace=True)
+
+@st.cache_data(show_spinner="Отримання даних з бази PSQL...", ttl=120)
+def get_data_dataframe():
+    df=pd.read_sql_query("""SELECT * FROM scantable order by dateandtime desc """, con)
+    return df
 
 
-    df_time=pd.read_sql_query("""select dateandtime::date as ds, count(id) as y from scantable group by dateandtime::date order by ds asc;""", con)
+@st.cache_data(show_spinner="Отримання даних з бази PSQL...",ttl=120)
+def get_data_chart():
+    df_time=pd.read_sql_query("""select territory,dateandtime::date as ds, count(id) as y from scantable group by dateandtime::date, territory order by ds asc;""", con)
     df_time['ds']=df_time['ds'].apply(pd.to_datetime)
-    df_time.set_index(df_time['ds'], inplace=True)
+    #df_time.set_index('ds', inplace=True)
+    df_time_all=pd.read_sql_query("""select dateandtime::date as ds, count(id) as y from scantable group by dateandtime::date order by ds asc;""", con)
+    df_time_all['ds']=df_time_all['ds'].apply(pd.to_datetime)
 
-    start=df_time['ds'][0]
-    end=df_time['ds'][len(df_time)-1]
-    date_range=pd.date_range(start=start, end=end, freq='D')
-    df_date_range=pd.DataFrame(date_range, columns=['ds'])
-    df_date_range.set_index('ds', inplace=True)
-    df_full=df_date_range.join(df_time,how='left', on='ds')
-    df_full.drop(columns=['ds'], inplace=True)
-    df_full['y'].fillna(value=0, inplace=True)
-    df_time=df_full
+    # Generate a date range between the minimum and maximum dates
+    date_range = pd.date_range(start=df_time['ds'].min(), end=df_time['ds'].max())
+
+    # List to store dataframes
+    dfs = []
+
+    # For each unique territory in the data
+    for territory in df_time['territory'].unique():
+        # Filter data for the current territory
+        territory_data = df_time[df_time['territory'] == territory]
+        
+        # Create a new dataframe with the complete range of dates
+        complete_dates = pd.DataFrame({'ds': date_range})
+        complete_dates['territory'] = territory
+        
+        # Merge this new dataframe with the territory data
+        merged_data = pd.merge(complete_dates, territory_data, on=['ds', 'territory'], how='left')
+        
+        # Fill missing 'y' values with zeros
+        merged_data['y'] = merged_data['y'].fillna(0)
+        
+        # Append the result to the list
+        dfs.append(merged_data)
+
+    # Concatenate all dataframes in the list to create a single dataframe
+    final_data = pd.concat(dfs, ignore_index=True)
+
+    # Now, use this `final_data` DataFrame to plot your chart
+     # Merge this new dataframe with the territory data
+    dfs_all=[]
+    merged_data = pd.merge(complete_dates, df_time_all, on=['ds'], how='left')
+    
+    # Fill missing 'y' values with zeros
+    merged_data['y'] = merged_data['y'].fillna(0)
+    
+    # Append the result to the list
+    dfs_all.append(merged_data)
+    df_time_all = pd.concat(dfs_all, ignore_index=True)
+    
+    df_time_reset = df_time.reset_index()
+    merged_data = pd.merge(complete_dates, df_time_reset, on='ds', how='left')
+    merged_data['y'] = merged_data['y'].fillna(0)
 
 
-    cursor.execute('select count(*) from scantable where dateandtime::date >now();')
-    today_date = cursor.fetchone()[0]
-    cursor.execute("select count(*) from scantable where dateandtime::date >now()- interval '1 day';")
-    yesterday_date = cursor.fetchone()[0]
 
 
 
-    return df, df_time, today_date, yesterday_date
+    return  df_time,df_time_all,final_data
 
-df, df_time, today_date, yesterday_date=get_data()
+
 
 filters = {
    'dateandtime': 'All',
    'territory': 'All'
 }
 
+filters_plot = {
+   'ds': 'All',
+   'territory': 'All'
+}
+
+filters_plot_all = {
+   'ds': 'All'
+}
+
 page_names_to_funcs = {
-    "DataFrame": DateFrame,
-    "Plotting": Plot,
-    "Monitoring": Monitoring
-    
-    
+    "Таблиця": DateFrame,
+    "Карта": GeospatialAnalysis,
+    "Графік": Plot
+
+
 }
 #"Mapping Demo": mapping_demo
-pages = st.sidebar.selectbox("Choose a page", page_names_to_funcs.keys())
+pages = st.sidebar.selectbox("Виберіть сторінку", page_names_to_funcs.keys())
 page_names_to_funcs[pages]()
 

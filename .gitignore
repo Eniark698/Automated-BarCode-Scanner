@@ -3,3 +3,5 @@ backup.zip
 __pycache__
 venv-win/
 database/
+.vscode
+vscode

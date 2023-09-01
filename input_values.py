@@ -27,10 +27,10 @@ def importv():
             check_word=data["check_word"]
         except Exception as err:
             days=100
-            scanfolder=["/project/scan/","/project/scanMukachevo/","/project/scanSambir/"]
+            scanfolder=["/project/scan/","/project/scanMukachevo/","/project/scanSambir/", "/project/scanTernopil/", "/project/scanVinnytsia/", "/project/scanZhytomyr/", "/project/scanRivne/", "/project/scanLutsk/","/project/scanKhmelnytskyi/","/project/scanFrankivsk/","/project/scanChernivtsi/"]
             donefolder="/project/done/"
             oldfolder="/project/not done/"
-            problemfolder=["/project/problem/","/project/problemMukachevo/","/project/problemSambir/"]
+            problemfolder=["/project/problem/","/project/problemMukachevo/","/project/problemSambir/","/project/problemTernopil/","/project/problemVinnytsia/","/project/problemZhytomyr/","/project/problemRivne/","/project/problemLutsk/","/project/problemKhmelnytskyi/","/project/problemFrankivsk/","/project/problemChernivtsi/"]
             logsfolder="/project/logs/"
             delay=5
             repeat_time=5

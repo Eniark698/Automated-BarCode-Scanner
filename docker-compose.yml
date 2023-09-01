@@ -9,6 +9,8 @@ services:
     ports:
       - 80:8501
     restart: always
+    user: "root"
+    privileged: true
   postgres:
     image: postgres:latest
     container_name: postgres

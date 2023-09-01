@@ -4,8 +4,8 @@
 
 Program scan file for barcode, detect it, and filter that files
 If you read more, program have in input file of any photos type, scan for barcode in, gain that info, if correct-- write to postgres database, and move to another folder; if barcode is not correct-- move to folder with incorrect codes; if it is not photos file-- move to folder with problem files
-After v3.1, scanner can rescan problem folder, if filename begin with check_word
-After v3.5, scanner use docker to containerization 
+<br>After v3.1, scanner can rescan problem folder, if filename begin with check_word
+<br>After v3.5, scanner use docker to containerization 
 
 ## Installation
 
@@ -35,7 +35,7 @@ To start using move config.json to F:/proc/
   cd Automated-BarCode-Scanner
   docker compose up -d --build
 ```
-After v3.5 scanner use postgres from docker-compose
+<br>After v3.5 scanner use postgres from docker-compose
 
 
 
@@ -44,20 +44,22 @@ After v3.5 scanner use postgres from docker-compose
 To run this project, you will need to set up path to each directories where files is stored, and set up amount of days, after which, outdated files will be deleted, delay to scan file after inserting, repeat time between two executions of scripts, check_word to extract from problem folder:
 #### parametr | default value
 
+`_comment_` | `/project/ is F:/proc/``  -- changes in directory name due to mounting it to docker container
+
 `days_to_remove` |`90` -- amount of date, after which photos will be deleted
 
-`path to placement of scan's folder` | `["/project/scan/","/project/scanMukachevo/","/project/scanSambir/"]` -- placement for files that used to be scanned
+`path to placement of scan's folder` | `["/project/scan/","/project/scanMukachevo/","/project/scanSambir/", "/project/scanTernopil/", "/project/scanVinnytsia/", "/project/scanZhytomyr/", "/project/scanRivne/", "/project/scanLutsk/","/project/scanKhmelnytskyi/","/project/scanFrankivsk/","/project/scanChernivtsi/"]` -- placement for files that used to be scanned
 
-`path to placement of done folder for code128` | `F:/proc/done/` --
+`path to placement of done folder for code128` | `/project/done/` --
 placement for CODE128 scanned files
 
-`path to placement of done folder for ean13 or code39` | `F:/proc/not done/` --
+`path to placement of done folder for ean13 or code39` | `/project/not done/` --
 placement for ean13 and code39 scanned files
 
-`path to placement of problem files's folder`| `["/project/problem/","/project/problemMukachevo/","/project/problemSambir/"]` --
+`path to placement of problem files's folder`| `["/project/problem/","/project/problemMukachevo/","/project/problemSambir/","/project/problemTernopil/","/project/problemVinnytsia/","/project/problemZhytomyr/","/project/problemRivne/","/project/problemLutsk/","/project/problemKhmelnytskyi/","/project/problemFrankivsk/","/project/problemChernivtsi/"]` --
 placement for files that can not be scanned because it is not photos, or for files, then have errors
 
-`path to placement of log's folder`| `F:/scan_proj/logs/` --
+`path to placement of log's folder`| `/project/logs/` --
 placement for log with encounted error during program executing
 
 `delay to scan file`| `5` --
