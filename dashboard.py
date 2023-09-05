@@ -489,7 +489,7 @@ def Plot():
             fig2.update_yaxes(title_text='Кількість документів')
             fig2.update_xaxes(tickformat='%d-%m-%Y')
 
-            fig2.update_traces(marker=dict(color='blue', line=dict(color='#87bc45', width=4)),
+            fig2.update_traces(marker=dict(color='blue', line=dict(color='#87bc45', width=420/len(df_time_all['y']))),
                    hoverlabel=dict(font_size=16),
                   hovertemplate='Дата: %{x}<br>Документів: %{y}')
 
@@ -515,15 +515,16 @@ def Plot():
             fig1.update_yaxes(title_text='Кількість документів')
             fig1.update_xaxes(tickformat='%d-%m-%Y')
 
-            fig1.update_traces(marker=dict(color='blue', line=dict(color='#87bc45', width=4)),
+            fig1.update_traces(marker=dict(color='blue', line=dict(color='#87bc45', width=420/len(df_time['y']))),
                    hoverlabel=dict(font_size=16),
                   hovertemplate='Дата: %{x}<br>Документів: %{y}')
 
 
             st.plotly_chart(fig1)
     
-
-
+    
+    
+    
     col1, col2 = st.columns([1, 1])
     with col1:
         st.write('Сьогодні було проскановано: ', today_date)
@@ -535,7 +536,8 @@ def Plot():
     # rerun.
     st.button("Перезавантажити")
 
-
+   
+    
 
 
 
@@ -560,7 +562,7 @@ from PsqlConnect import connect
 global con, cursor, monday, sunday, zero_time, one_time
 
 
-@st.cache_resource(show_spinner="Утворення з'єднання до бази PSQL...")
+@st.cache_resource(show_spinner="Утворення з'єднання до бази PSQL...", ttl=180)
 def psqlconnection():
     _ , con= connect()
     return con
