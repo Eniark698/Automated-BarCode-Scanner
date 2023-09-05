@@ -358,8 +358,13 @@ def Plot():
         st.session_state["default_plot"] = "Lviv"
     if 'disable_opt_plot' not in st.session_state:
         st.session_state.disable_opt = False
-    if 'date_input_plot' not in st.session_state:
-        st.session_state['date_input_plot'] = [   ]
+    def initialize_state():
+        if 'date_range' not in st.session_state:
+            st.session_state.date_range = ()
+    initialize_state()
+
+
+
 
     #progress_bar = st.sidebar.progress(0)
     #status_text = st.sidebar.empty()
@@ -384,23 +389,43 @@ def Plot():
     
     
 
-    
     filters_plot['territory']=[territories]
 
-    
-    time_input=st.date_input('Вибрати часові межі:', st.session_state["date_input_plot"], format='DD/MM/YYYY')
+    time_input = st.date_input('Вибрати часові межі', st.session_state.date_range, key='date_range_picker',format='DD/MM/YYYY')
 
-    st.session_state['date_input_plot'] = time_input
+    # Saving the chosen date range to session state
+    st.session_state.date_range = time_input
 
-    button=st.button('Очистити часовий фільтр')
-    
- 
-    if button:
-        st.session_state['date_input_plot'] = ()
-        # st.session_state["default"][0]=[]
+
+    # Display a button to clear the date filter
+    if st.button("Очистити часовий фільтр"):
+        st.session_state.date_range = ()
         filters_plot['ds']='All'
-        st.experimental_rerun()
-        #st.date_input('Choose date limits:', [])=[]
+        #st.experimental_rerun()
+
+
+
+
+    # time_input=st.date_input('Вибрати часові межі:', st.session_state["date_input_plot"], format='DD/MM/YYYY')
+
+    # st.session_state['date_input_plot'] = time_input
+
+
+   
+
+
+    # button=st.button('Очистити часовий фільтр')
+ 
+    # if button:
+    #     st.session_state['date_input_plot'] = []
+
+    #     # st.session_state["default"][0]=[]
+    #     filters_plot['ds']='All'
+    #     st.experimental_rerun()
+    #     #st.date_input('Choose date limits:', [])=[]
+
+
+  
 
     
     
