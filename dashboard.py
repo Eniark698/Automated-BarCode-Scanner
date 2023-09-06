@@ -220,8 +220,8 @@ def GeospatialAnalysis():
     # locations should be generated from your actual data source
     locations = pd.DataFrame({
         'territory': ['Lviv', 'Mukachevo', 'Sambir', 'Ternopil', 'Vinnytsia', 'Zhytomyr', 'Rivne', 'Lutsk', 'Khmelnytskyi', 'Frankivsk', 'Chernivtsi'],
-        'lat': [49.842957, 48.262108, 49.310588, 49.553516, 49.135801, 50.155353, 50.619900, 50.453355, 49.251780, 48.551740, 48.172936],
-        'lon': [24.031111, 22.430404, 23.115107, 25.594767, 28.285149, 28.403608, 26.251617, 25.203278, 26.594751, 24.423499, 25.562522]
+        'lat': [49.8382600, 48.4391900, 49.5183000, 49.5558900, 49.2327800, 50.2648700, 50.6230800, 50.7593200 , 49.4216100, 48.9215000, 48.2914900],
+        'lon': [24.0232400, 22.7177900, 23.1975200, 25.6055600, 28.4809700, 28.6766900, 26.2274300, 25.3424400 , 26.9965300, 24.7097200, 25.9403400]
     })
     
     # Merge the df and locations dataframes on the 'territory' column
@@ -383,10 +383,9 @@ def Plot():
     
     
     territories = st.selectbox(
-        "Вибрати територію", df_time.territory.unique(), index=list(df.territory.unique()).index(st.session_state["default_plot"]), disabled = st.session_state.disable_opt
+        "Вибрати територію", df_time.territory.unique(), index=list(df_time.territory.unique()).index(st.session_state["default_plot"]), disabled = st.session_state.disable_opt
     )
     st.session_state["default_plot"] = territories
-    
     
 
     filters_plot['territory']=[territories]
