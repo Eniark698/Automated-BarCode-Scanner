@@ -1,0 +1,8 @@
+pyzbar 
+psycopg2-binary  
+Pillow 
+pytz 
+streamlit 
+plotly 
+pydeck
+pywin32

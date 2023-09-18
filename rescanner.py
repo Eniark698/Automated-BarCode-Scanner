@@ -1,19 +1,10 @@
 def rescan(donefolder, problemfolder, logsfolder, check_word, pattern,cur, con):
-    from tendo import singleton
-    from sys import exit
-
-    try:
-        me = singleton.SingleInstance()
-    except:
-        print("Already running")
-        exit(-1)
-
     from os import mkdir, listdir, stat, remove
-    from shutil import copy, move
+    from shutil import copy
     from PIL import Image
 
     Image.MAX_IMAGE_PIXELS = 100000000
-    from datetime import datetime, timezone,timedelta
+    from datetime import datetime
     from random import random, seed
     from traceback import format_exc
     import re
@@ -23,40 +14,15 @@ def rescan(donefolder, problemfolder, logsfolder, check_word, pattern,cur, con):
     seed(hash(str(datetime.now(pytz.timezone('Europe/Kyiv')))))
 
     j = 0
+    j1=0
     check_len = len(check_word) + 1
     format = "JPEG"
 
     try:
         # for all files in problem folder
-        for iter in range(len(problemfolder)):
+        for ter, problemfolder_location  in problemfolder.items():
             # get all filenames in problem folder
-            list = listdir(problemfolder[iter])
-
-            match iter:
-
-                case 0:
-                    ter='Lviv'
-                case 1:
-                    ter='Mukachevo'
-                case 2:
-                    ter='Sambir'
-                case 3:
-                    ter='Ternopil'
-                case 4:
-                    ter='Vinnytsia'
-                case 5:
-                    ter='Zhytomyr'
-                case 6:
-                    ter='Rivne'
-                case 7:
-                    ter='Lutsk'
-                case 8:
-                    ter='Khmelnytskyi'
-                case 9:
-                    ter='Frankivsk'
-                case 10:
-                    ter='Chernivtsi'
-
+            list = listdir(problemfolder_location)
 
             for i in list:
                 size = None
@@ -66,9 +32,9 @@ def rescan(donefolder, problemfolder, logsfolder, check_word, pattern,cur, con):
                     j += 1
                     # try to open photo to get format and size
                     try:
-                        image = Image.open(problemfolder[iter] + str(i))
+                        image = Image.open(problemfolder_location + str(i))
                         image.close()
-                        size = str(stat(problemfolder[iter] + str(i)).st_size)
+                        size = str(stat(problemfolder_location + str(i)).st_size)
                     except:
                         pass
 
@@ -122,16 +88,17 @@ def rescan(donefolder, problemfolder, logsfolder, check_word, pattern,cur, con):
                     # copy file into folder
                     try:
                         copy(
-                            problemfolder[iter] + str(i),
+                            problemfolder_location + str(i),
                             donefolder + direction + "/" + answer + "/" + name,
                         )
-                        remove(problemfolder[iter] + str(i))
+                        remove(problemfolder_location + str(i))
                     except:
                         con.rollback()
                         continue
 
                     # commit inserting into DB
                     con.commit()
+                    j1+=1
 
                 else:
                     continue
@@ -148,5 +115,6 @@ def rescan(donefolder, problemfolder, logsfolder, check_word, pattern,cur, con):
         f.close()
 
     # exit
-    print(j, " files was rescanned")
+    print(j, " with true start substring")
+    print(j1, " files was rescanned")
   

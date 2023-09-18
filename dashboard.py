@@ -211,7 +211,7 @@ def DateFrame():
 
 def GeospatialAnalysis():
     df=get_data_dataframe()
-    st.markdown(f"# {list(page_names_to_funcs.keys())[2]}")
+    st.markdown(f"# {list(page_names_to_funcs.keys())[1]}")
     st.write("Ця сторінка показує візуалізації карти розподілення документів по територіях (за весь час)")
     
     
@@ -347,7 +347,7 @@ def Plot():
     cursor.execute("select count(*) from scantable where dateandtime::date >=(now()- interval '1 day')::date;")
     yesterday_date = cursor.fetchone()[0]
 
-    st.markdown(f'# {list(page_names_to_funcs.keys())[1]}')
+    st.markdown(f'# {list(page_names_to_funcs.keys())[2]}')
     st.write(
         """
         Ця сторінка ілюструє комбінацію лінійного графіку та гістограми. 
@@ -583,17 +583,17 @@ st.set_page_config(layout='wide')
 
 
 from PsqlConnect import connect
-global con, cursor, monday, sunday, zero_time, one_time
+global connection, cursor, monday, sunday, zero_time, one_time
 
 
 @st.cache_resource(show_spinner="Утворення з'єднання до бази PSQL...", ttl=180)
 def psqlconnection():
-    _ , con= connect()
-    return con
+    _ , connection= connect()
+    return connection
 
 
-con=psqlconnection()
-cursor = con.cursor()
+connection=psqlconnection()
+cursor = connection.cursor()
 
 
 
@@ -616,16 +616,16 @@ sunday=datetime.combine(sunday, one_time)#.strftime('%d/%m/%Y, %H:%M:%S')
 
 @st.cache_data(show_spinner="Отримання даних з бази PSQL...", ttl=120)
 def get_data_dataframe():
-    df=pd.read_sql_query("""SELECT * FROM scantable order by dateandtime desc """, con)
+    df=pd.read_sql_query("""SELECT * FROM scantable order by dateandtime desc """, connection)
     return df
 
 
 @st.cache_data(show_spinner="Отримання даних з бази PSQL...",ttl=120)
 def get_data_chart():
-    df_time=pd.read_sql_query("""select territory,dateandtime::date as ds, count(id) as y from scantable group by dateandtime::date, territory order by ds asc;""", con)
+    df_time=pd.read_sql_query("""select territory,dateandtime::date as ds, count(id) as y from scantable group by dateandtime::date, territory order by ds asc;""", connection)
     df_time['ds']=df_time['ds'].apply(pd.to_datetime)
     #df_time.set_index('ds', inplace=True)
-    df_time_all=pd.read_sql_query("""select dateandtime::date as ds, count(id) as y from scantable group by dateandtime::date order by ds asc;""", con)
+    df_time_all=pd.read_sql_query("""select dateandtime::date as ds, count(id) as y from scantable group by dateandtime::date order by ds asc;""", connection)
     df_time_all['ds']=df_time_all['ds'].apply(pd.to_datetime)
 
     # Generate a date range between the minimum and maximum dates

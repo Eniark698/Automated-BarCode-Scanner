@@ -1,0 +1,7 @@
+[global]
+showWarning = false
+disableWatchdogWarning = true
+
+
+[server]
+headless = true

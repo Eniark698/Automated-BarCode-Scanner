@@ -4,10 +4,10 @@ def importv():
     from datetime import datetime
 
     #make variables global to get it from another scripts
-    global  scanfolder, donefolder, oldfolder,problemfolder,logsfolder,delay,repeat_time,check_word
+    #global  scanfolder, donefolder, oldfolder,problemfolder,logsfolder,delay,repeat_time,check_word
 
     #standart path to read config file
-    path="/project/"
+    path="F:/proc/"
 
 
 
@@ -27,10 +27,32 @@ def importv():
             check_word=data["check_word"]
         except Exception as err:
             days=100
-            scanfolder=["/project/scan/","/project/scanMukachevo/","/project/scanSambir/", "/project/scanTernopil/", "/project/scanVinnytsia/", "/project/scanZhytomyr/", "/project/scanRivne/", "/project/scanLutsk/","/project/scanKhmelnytskyi/","/project/scanFrankivsk/","/project/scanChernivtsi/"]
+            scanfolder={"Lviv":"F:/proc/scan/"
+                ,"Mukachevo":"F:/proc/scanMukachevo/"
+                ,"Sambir":"F:/proc/scanSambir/"
+                ,"Ternopil":"F:/proc/scanTernopil/"
+                ,"Vinnytsia":"F:/proc/scanVinnytsia/"
+                ,"Zhytomyr":"F:/proc/scanZhytomyr/"
+                ,"Rivne":"F:/proc/scanRivne/"
+                ,"Lutsk":"F:/proc/scanLutsk/"
+                ,"Khmelnytskyi":"F:/proc/scanKhmelnytskyi/"
+                ,"Frankivsk":"F:/proc/scanFrankivsk/"
+                ,"Chernivtsi":"F:/proc/scanChernivtsi/"},
+            
             donefolder="/project/done/"
             oldfolder="/project/not done/"
-            problemfolder=["/project/problem/","/project/problemMukachevo/","/project/problemSambir/","/project/problemTernopil/","/project/problemVinnytsia/","/project/problemZhytomyr/","/project/problemRivne/","/project/problemLutsk/","/project/problemKhmelnytskyi/","/project/problemFrankivsk/","/project/problemChernivtsi/"]
+            problemfolder={"Lviv":"F:/proc/problem/"
+                ,"Mukachevo":"F:/proc/problemMukachevo/"
+                ,"Sambir":"F:/proc/problemSambir/"
+                ,"Ternopil":"F:/proc/problemTernopil/"
+                ,"Vinnytsia":"F:/proc/problemVinnytsia/"
+                ,"Zhytomyr":"F:/proc/problemZhytomyr/"
+                ,"Rivne":"F:/proc/problemRivne/"
+                ,"Lutsk":"F:/proc/problemLutsk/"
+                ,"Khmelnytskyi":"F:/proc/problemKhmelnytskyi/"
+                ,"Frankivsk":"F:/proc/problemFrankivsk/"
+                ,"Chernivtsi":"F:/proc/problemChernivtsi/"},
+            
             logsfolder="/project/logs/"
             delay=5
             repeat_time=5

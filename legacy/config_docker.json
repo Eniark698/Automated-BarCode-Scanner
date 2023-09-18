@@ -1,0 +1,16 @@
+{
+    "_comment":"WHEN WRITING NEW PATH, REMEMBER TO ADD / AT THE END",
+    "_comment_":"/project/ is F:/proc/",
+
+    "days_to_remove":90,
+    "delay to scan file":5,
+    "repeat time in minutes between two executions of script":2,
+    "check_word":"IRIS",
+
+    "path to placement of scan`s folder": ["/project/scan/","/project/scanMukachevo/","/project/scanSambir/", "/project/scanTernopil/", "/project/scanVinnytsia/", "/project/scanZhytomyr/", "/project/scanRivne/", "/project/scanLutsk/","/project/scanKhmelnytskyi/","/project/scanFrankivsk/","/project/scanChernivtsi/"],
+    "path to placement of done folder for code128": "/project/done/",
+    "path to placement of done folder for ean13 or code39": "/project/not done/",
+    "path to placement of problem files`s folder": ["/project/problem/","/project/problemMukachevo/","/project/problemSambir/","/project/problemTernopil/","/project/problemVinnytsia/","/project/problemZhytomyr/","/project/problemRivne/","/project/problemLutsk/","/project/problemKhmelnytskyi/","/project/problemFrankivsk/","/project/problemChernivtsi/"],
+    "path to placement of log`s folder": "/project/logs/"
+    
+}

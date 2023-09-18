@@ -1,14 +1,10 @@
 def connect():    
 
     import psycopg2
-    # con = psycopg2.connect(
-    #     host="postgres", database="customs", user="operator", password="ad-fkd342o5-pk3262"
-    # )
     con = psycopg2.connect(
-        host="postgres", database="postgres", user="postgres", password="frgthy"
+        host="localhost", database="postgres", user="postgres", password="frgthy"
     )
     
-    # con.autocommit = True
     cur = con.cursor()
     cur.execute(
         """create table if not exists scantable(
@@ -22,5 +18,7 @@ def connect():
         ,is_rescanned boolean
         ,territory varchar(100));"""
     )
+    
+    
     con.commit()
     return cur, con

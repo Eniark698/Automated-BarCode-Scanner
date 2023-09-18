@@ -5,3 +5,4 @@ venv-win/
 database/
 .vscode
 vscode
+venv/
