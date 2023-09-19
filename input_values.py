@@ -16,6 +16,7 @@ def importv():
         data = json.load(json_file)
         
         try:
+            en_multproc=data['enable_multiprocessing']
             days=data['days_to_remove']
             scanfolder=data["path to placement of scan`s folder"]
             donefolder=data["path to placement of done folder for code128"]
@@ -26,6 +27,7 @@ def importv():
             repeat_time=data["repeat time in minutes between two executions of script"]
             check_word=data["check_word"]
         except Exception as err:
+            en_multproc=0
             days=100
             scanfolder={"Lviv":"F:/proc/scan/"
                 ,"Mukachevo":"F:/proc/scanMukachevo/"
@@ -65,9 +67,9 @@ def importv():
             f.write('occurred on ' + str(datetime.now()))
             f.write('\n--\n\n\n')
             f.close()
-            return days, scanfolder, donefolder,oldfolder,problemfolder,logsfolder,delay,repeat_time,check_word
+            return days, scanfolder, donefolder,oldfolder,problemfolder,logsfolder,delay,repeat_time,check_word,en_multproc
 
 
     
     #return imported values
-    return days, scanfolder, donefolder,oldfolder,problemfolder,logsfolder,delay,repeat_time,check_word
+    return days, scanfolder, donefolder,oldfolder,problemfolder,logsfolder,delay,repeat_time,check_word,en_multproc

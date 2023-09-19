@@ -7,21 +7,21 @@ def run_main_loop(cur, con):
     
     #import all important path variables, and set pattern for barcodes
     pattern=r'[0-9]{5}\-[0-9]{7}_[0-9]{4}_[0-9]{1}_[a-zA-z]'
-    days, scanfolder, donefolder, oldfolder, problemfolder, logsfolder, delay,repeat_time,check_word =importv()
+    days, scanfolder, donefolder, oldfolder, problemfolder, logsfolder, delay,repeat_time,check_word,en_multproc =importv()
 
 
 
 
-    #TO_ENABLE MULTIPROCESSING
-    #from scanner import scan_run
-    #scan_run(scanfolder, donefolder,oldfolder,problemfolder,logsfolder,delay,pattern)
-
-    #TO_ENABLE ONEPROCESSING
-    from scanner_one_process import scan
-    scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder,delay,pattern)
-    rescan(donefolder,problemfolder,logsfolder,check_word,pattern,cur, con)
-
-
+    
+    if en_multproc==0:
+        #TO_ENABLE ONEPROCESSING
+        from scanner_one_process import scan
+        scan(scanfolder, donefolder,oldfolder,problemfolder,logsfolder,delay,pattern)
+        rescan(donefolder,problemfolder,logsfolder,check_word,pattern,cur, con)
+    elif en_multproc==1:
+        #TO_ENABLE MULTIPROCESSING
+        from scanner import scan_run
+        scan_run(scanfolder, donefolder,oldfolder,problemfolder,logsfolder,delay,pattern)
 
 
 

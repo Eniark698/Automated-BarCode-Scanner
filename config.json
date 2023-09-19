@@ -1,6 +1,7 @@
 {
     "_comment":"WHEN WRITING NEW PATH, REMEMBER TO ADD / AT THE END",
     
+    "enable_multiprocessing":0,
     "days_to_remove":90,
     "delay to scan file":5,
     "repeat time in minutes between two executions of script":5,

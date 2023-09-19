@@ -44,6 +44,9 @@ Make sure that you have installed psql
 To run this project, you will need to set up path to each directories where files is stored, and set up amount of days, after which, outdated files will be deleted, delay to scan file after inserting, repeat time between two executions of scripts, check_word to extract from problem folder:
 #### parameter | default value
 
+
+`enable_multiprocessing` | `0` -- 1 for enable, 0 for disable (activate multiprocessing of scanfolder for scan each location in parallel(up to 11x faster))
+
 `days_to_remove` |`90` -- amount of date, after which photos will be deleted
 
 `path to placement of scan's folder` | `{"Lviv":"F:/proc/scan/"
